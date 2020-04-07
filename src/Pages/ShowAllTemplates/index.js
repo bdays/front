@@ -161,7 +161,7 @@ export default function () {
                         name: 'number',
                         className: 'td-sm',
                         children: index + 1,
-                        classNameRow: (currentId === item.id) && (collapseTableOfTemplates) ? 'trActive' : '',
+                        classNameRow: ((currentId === item.id) && (collapseTableOfTemplates))? 'trActive' : '',
                     },
                     {
                         name: 'name',

@@ -14,7 +14,8 @@
 }
 
 .div-button-group .btn-button-group:hover {
-  background-color: darkgray;
+  background-color: rgba(137, 70, 65, 0.28);
+  transition: background-color 0.3s linear;
 }
 
 .div-button-group {

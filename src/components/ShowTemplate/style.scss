@@ -21,5 +21,12 @@
    display: block;
     padding: 10px;
     font-family: Courier New, monospace;
+
+    opacity:0;
+    transition: 1s;
+    animation: show 0.3s 1;
+    animation-fill-mode: forwards; /* Чтобы элемент оставался в конечном состоянии анимации */
+    animation-delay: 0.3s;
   }
+
 }

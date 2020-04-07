@@ -30,7 +30,7 @@ function Table({
                 <tr key={'content' + i}>
                     {item.map((itemChild, j) => (
                         <td onClick={itemChild.onClickRow} key={'content' + i + '.' + j} colSpan={itemChild.colSpan}
-                            className={itemChild.className + ' ' + itemChild.classNameRow}>
+                            className={("classNameRow" in itemChild)?(itemChild.className + ' ' + itemChild.classNameRow):(itemChild.className)}>
                             {itemChild.children}
                         </td>
                     ))}

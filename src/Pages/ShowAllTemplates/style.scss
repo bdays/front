@@ -1,17 +1,43 @@
 .div-panel-left {
-  width: 30%;
+  width: 100%;
   min-height: calc(100vh - 50px);
   border-radius: 4px 4px 4px 4px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.40);
   display: inline-block;
   overflow: auto;
+  transition: 1s; /*Скорость перехода состояния элемента*/
+  animation: showw 0.5s 1; /* Указываем название анимации, её время и количество повторов*/
+  animation-fill-mode: forwards; /* Чтобы элемент оставался в конечном состоянии анимации */
+}
+
+@keyframes showw{
+  0%{
+    width: 100%;
+  }
+  100% {
+    width:30%;
+  }
 }
 
 .div-panel-right {
   padding: 4px 0 0 0;
-  width: 70%;
+  display: inline-block;
+  width: 0;
   vertical-align: top;
   min-height: calc(100vh - 50px);
   background-color: rgba(0, 0, 0, 0);
-  display: inline-block;
+
+  transition: 1s; /*Скорость перехода состояния элемента*/
+  animation: showww 0.5s 1; /* Указываем название анимации, её время и количество повторов*/
+  animation-fill-mode: forwards; /* Чтобы элемент оставался в конечном состоянии анимации */
+
+}
+
+@keyframes showww{
+  0%{
+    width: 0;
+  }
+  100% {
+    width:70%;
+  }
 }
