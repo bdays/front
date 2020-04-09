@@ -1,21 +1,22 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
-import moment from "moment";
 
 import './style.scss';
 
 import {calendarDeleteBday, calendarFetchListOfBdays, calendarEditBday} from '../../Reducers/calendar';
 
-import Table from "../../components/table";
+import Table from "../../components/Table";
 import Button from "../../components/Button";
 import FormBday from "../../components/FormBday";
 import Modal from "../../components/Modal";
 import SnackBar from "../../components/SnackBar";
+import {dateToUnix} from "../../Utils/date";
+import {getCell} from "../../Utils/table";
 
 function ShowAllBdayPage() {
-    const {payload} = useSelector(state => state.calendar.list, shallowEqual);
-    const isLoading = useSelector(state => state.calendar.list.isLoading, shallowEqual);
+    const {payload, isLoading} = useSelector(state => state.calendar.list, shallowEqual);
     const dispatch = useDispatch();
+
     const [editData, setEditData] = useState({id: null, firstName: '', lastName: '', data: {}, date: ''});//редактируемые данные, которые отобажаются в модалке
     const [showModal, setShowModal] = useState(false);//модалка для редактирования ДР
     const [viewMode, setViewMode] = useState(false);//активаця режима просмотра
@@ -44,7 +45,7 @@ function ShowAllBdayPage() {
             if (resp.ok) {
                 setSnackBarContent('Birthday successfully edit');
             } else {
-                setSnackBarContent('Error: '+resp.statusText);
+                setSnackBarContent('Error: ' + resp.statusText);
             }
             setShowSnackBar(true);
             setTimeout(() => setShowSnackBar(false), 3000);
@@ -61,69 +62,16 @@ function ShowAllBdayPage() {
         table = [];
         tablePattern.content = [];
         if (viewMode) {//VIEW MODE
-            const maxBdaysInMonth = getMaxBdaysInMonth(payload);
-            let per = 0;
-            for (const item in payload) {
-                tablePattern.content = [];
-                tablePattern.content.push([
-                    {
-                        name: 'name',
-                        children: item,
-                        className: 'heading',
-                        colSpan: '2'
-                    },
-                ]);
-                //
-                for (let i = 0; i < maxBdaysInMonth[~~(per / 3)]; i++) {
-                    try {
-                        tablePattern.content.push([
-                            {
-                                name: 'date', className: 'td-m',
-                                children: payload[item][i].day
-                            },
-                            {
-                                name: 'name',
-                                children: payload[item][i].fullName,
-                                className: 'td-l',
-                            },
-                        ]);
-                    } catch (e) {//добавляем пустые строки, чтобы таблицы выглядели красиво
-                        tablePattern.content.push([
-                            {
-                                name: 'date', className: 'td-m',
-                                children: '\u00A0',
-                            },
-                            {
-                                name: 'name',
-                                children: '\u00A0',
-                                className: 'td-l',
-                            },
-                        ]);
-                    }
-                }
-                table.push(<Table key={'table' + item}
-                                  classNameTable={'table-viewMode'}
-                                  classNameBlock={'div-forViewMode'}
-                                  classNameTableHead={'heading'}
-                                  header={tablePattern.header} content={tablePattern.content}
-                                  isLoading={isLoading}/>);
-                per++;
-
-            }
+            table = getTableForViewMode(payload);
         } else {
             for (const item in payload) {
                 if (payload[item].length > 0) {//пишем название месяца только если там есть ДР
                     tablePattern.content.push([
-                        {
-                            name: 'name',
-                            children: item,
-                            className: 'heading',
-                            colSpan: '3'
-                        },
+                        getCell('heading', item, 3),
                     ]);
                 }
                 payload[item].forEach((subItem, subIndex) => {
-                    let action = [<Button key={'ButtonEdit' + subIndex} children={'Edit'} className={"btnEdit"}
+                    let action = [<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
                                           onClick={() => {
                                               setShowModal(true);
                                               setEditData({
@@ -134,31 +82,20 @@ function ShowAllBdayPage() {
                                                   date: ''
                                               })
                                           }}/>,
-                        <Button key={'ButtonDelete' + subIndex} children={'Delete'} className={"btn-delete"}
+                        <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
                                 onClick={() => {
                                     setCurrentId(subItem.id);
                                     setShowSimpleModal(true);
                                 }}/>];
-                    // handleDelete(subItem.id)
+
                     tablePattern.content.push([
-                        {
-                            name: 'date', className: 'td-m',
-                            children: subItem.day
-                        },
-                        {
-                            name: 'name',
-                            children: subItem.fullName,
-                            className: 'th-l',
-                        },
-                        {
-                            name: 'action',
-                            className: 'td-action',
-                            children: action,
-                        }
+                        getCell('td-m', subItem.day, null),
+                        getCell('th-l', subItem.fullName, null),
+                        getCell('td-action', action, null),
                     ]);
                 });
             }
-            table.push(<Table key={'mainTable'} classNameTable={tablePattern.classNameTable}
+            table.push(<Table key='mainTable' classNameTable={tablePattern.classNameTable}
                               classNameTableHead={tablePattern.classNameTableHead}
                               header={tablePattern.header} content={tablePattern.content}
                               isLoading={isLoading}/>);
@@ -166,36 +103,36 @@ function ShowAllBdayPage() {
 
     } else {
         //вывести спиннер, если данные с сервера еще не подгрузились
-        table.push(<Table key={'mainTable'} classNameTable={tablePattern.classNameTable}
+        table.push(<Table key='mainTable' classNameTable={tablePattern.classNameTable}
                           classNameTableHead={tablePattern.classNameTableHead}
                           header={tablePattern.header} content={tablePattern.content}
                           isLoading={isLoading}/>);
     }
 
     return <div>
-        <Modal show={showSimpleModal} header={'Delete'}
+        <Modal show={showSimpleModal} header='Delete'
                content={<>You sure?
-                   <Button className={'btn-modal-yes'}
-                           children={'No'}
+                   <Button className='btn-modal-yes'
+                           children='No'
                            onClick={() => setShowSimpleModal(false)}/>
-                   <Button className={'btn-modal-yes'} children={'Yes'}
+                   <Button className='btn-modal-yes' children='Yes'
                            onClick={() => handleDelete(currentId)}/>
                </>}
                toClose={() => setShowSimpleModal(false)}/>
-        <Modal show={showModal} header={'Edit birthday'}
+        <Modal show={showModal} header='Edit birthday'
                content={<FormBday edit={true} onSave={(data) => {
                    handleEdit(data.id, {
                        firstName: data.firstName,
                        lastName: data.lastName,
                        data: data.data,
-                       date: moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix(),
+                       date: dateToUnix(data.date),
                    });
                    setShowModal(false);
                }} editData={editData}/>}
                toClose={() => setShowModal(false)}/>
         <SnackBar show={showSnackBar} content={snackBarContent}/>
         <br/>
-        <Button className={'btn-viewMode'} children={'view mode'} onClick={() => setViewMode(!viewMode)}/><br/>
+        <Button className='btn-viewMode' children='view mode' onClick={() => setViewMode(!viewMode)}/><br/>
         <br/>
         <div>{table}</div>
     </div>;
@@ -209,6 +146,35 @@ let tablePattern = {
     header: [],
     content: []
 };
+
+function getTableForViewMode(payload) {
+    const maxBdaysInMonth = getMaxBdaysInMonth(payload);
+    let table = [];
+    let per = 0;
+
+    for (const item in payload) {
+        tablePattern.content = [];
+        tablePattern.content.push([getCell('heading', item, 2)]);
+
+        for (let i = 0; i < maxBdaysInMonth[~~(per / 3)]; i++) {
+
+            tablePattern.content.push([
+                getCell('td-m', (payload[item][i]) ? payload[item][i].day : '\u00A0', null),
+                getCell('td-l', (payload[item][i]) ? payload[item][i].fullName : '\u00A0', null),
+            ]);
+        }
+        table.push(<Table key={'table' + item}
+                          classNameTable='table-viewMode'
+                          classNameBlock='div-forViewMode'
+                          classNameTableHead='heading'
+                          header={[]} content={tablePattern.content}
+                          isLoading={false}/>);
+        per++;
+    }
+    return table;
+}
+
+
 
 function getMaxBdaysInMonth(payload) {
     //возвращается [a,b,c,d], где абсд - максимальные кол-ва др

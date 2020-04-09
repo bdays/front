@@ -10,7 +10,7 @@ import {
     calendarFetchTemplate, calendarFetchTemplateWithBday
 } from "../../Reducers/templates";
 
-import Table from "../../components/table";
+import Table from "../../components/Table";
 import Button from "../../components/Button";
 import Modal from "../../components/Modal";
 import ShowTemplate from "../../components/ShowTemplate";
@@ -22,8 +22,7 @@ import ListOfBdays from "../../components/ListOfBdays";
 
 export default function () {
     const dispatch = useDispatch();
-    const {payload} = useSelector(state => state.templates.list, shallowEqual);
-    const isLoading = useSelector(state => state.templates.list.isLoading, shallowEqual);
+    const {payload,isLoading} = useSelector(state => state.templates.list, shallowEqual);
     const template = useSelector(state => state.templates.template, shallowEqual);
     const templateWithBday = useSelector(state => state.templates.templateWithBday, shallowEqual);
 
@@ -136,7 +135,7 @@ export default function () {
         tablePattern.content = [];
         try {
             payload.forEach((item, index) => {
-                let action = [<Button key={'ButtonShow' + index} children={'Show'} className={"btnEdit"}
+                let action = [<Button key={'ButtonShow' + index} children="Show" className="btnEdit"
                                       onClick={() => {
                                           setActiveButton(show);
                                           if (!collapseTableOfTemplates) (setCollapseTableOfTemplates(true));
@@ -147,7 +146,7 @@ export default function () {
                                           setCurrentId(item.id);
                                           handleGetTemplate(item.id);
                                       }}/>,
-                    <Button key={'ButtonDelete' + index} children={'×'} className={"btn-delete-x"}
+                    <Button key={'ButtonDelete' + index} children="×" className={"btn-delete-x"}
                             onClick={() => {
                                 setCurrentId(item.id);
                                 setShowSimpleModal(true);
@@ -197,8 +196,8 @@ export default function () {
         switch (activeButton) {
             case openTemplateWithBday:
                 tabContent = (templateWithBday.isLoading ? <Spinner className='loader2'/> :
-                    [<Button key={'buttonBack'} className={'button-go'} children={'<< Back'} onClick={()=>setActiveButton(open)}/>
-                    ,<ShowTemplate key={'ShowBack'} payload={templateWithBday.payload}/>]);
+                    [<Button key="buttonBack" className='button-go' children='<< Back' onClick={()=>setActiveButton(open)}/>
+                    ,<ShowTemplate key='ShowBack' payload={templateWithBday.payload}/>]);
                 break;
             case open:
                 tabContent = (<ListOfBdays onClickGo={(id) => {
@@ -213,7 +212,7 @@ export default function () {
                 break;
         }
 
-        rightPanel = (<div className={'div-panel-right'}>
+        rightPanel = (<div className='div-panel-right'>
             <ButtonGroup buttonGroup={buttonGroup}/>
             {tabContent}
         </div>);
@@ -223,7 +222,7 @@ export default function () {
 
     return (
         <div>
-            <Modal show={showModal} header={'Edit template'}
+            <Modal show={showModal} header='Edit template'
                    content={<FormTemplate edit={true} editData={template.payload} onSave=
                        {(data) => {
                            handleEditTemplate(currentId, data);
@@ -231,12 +230,12 @@ export default function () {
                        }}
                    />} toClose={() => setShowModal(false)}/>
 
-            <Modal show={showSimpleModal} header={'Delete'}
+            <Modal show={showSimpleModal} header='Delete'
                    content={<>You sure?
-                       <Button className={'btn-modal-yes'}
-                               children={'No'}
+                       <Button className='btn-modal-yes'
+                               children='No'
                                onClick={() => setShowSimpleModal(false)}/>
-                       <Button className={'btn-modal-yes'} children={'Yes'}
+                       <Button className='btn-modal-yes' children='Yes'
                                onClick={() => handleDelete(currentId)}/>
                    </>}
                    toClose={() => setShowSimpleModal(false)}/>

@@ -5,12 +5,12 @@
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.40);
   display: inline-block;
   overflow: auto;
-  transition: 1s; /*Скорость перехода состояния элемента*/
-  animation: showw 0.5s 1; /* Указываем название анимации, её время и количество повторов*/
-  animation-fill-mode: forwards; /* Чтобы элемент оставался в конечном состоянии анимации */
+  transition: 1s;
+  animation: show-left-panel 0.5s 1;
+  animation-fill-mode: forwards;
 }
 
-@keyframes showw{
+@keyframes show-left-panel{
   0%{
     width: 100%;
   }
@@ -27,13 +27,13 @@
   min-height: calc(100vh - 50px);
   background-color: rgba(0, 0, 0, 0);
 
-  transition: 1s; /*Скорость перехода состояния элемента*/
-  animation: showww 0.5s 1; /* Указываем название анимации, её время и количество повторов*/
-  animation-fill-mode: forwards; /* Чтобы элемент оставался в конечном состоянии анимации */
+  transition: 1s;
+  animation: show-right-panel 0.5s 1;
+  animation-fill-mode: forwards;
 
 }
 
-@keyframes showww{
+@keyframes show-right-panel{
   0%{
     width: 0;
   }

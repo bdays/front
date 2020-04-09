@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
+
 import './style.scss'
+
 import Button from "../Button";
 import Input from "../Input";
 import ErrorBlock from "../Error";
-import moment from "moment";
 import {compareObj} from "../../Utils/objects";
+import {dateOfBdayValidation, isValidationSuccessful, nameValidation} from "../../Utils/validation";
+import {dateFormat} from "../../Utils/date";
 
 function FormBday({editData, onSave, edit}) {
     const [data, setData] = useState(editData);
@@ -17,10 +20,10 @@ function FormBday({editData, onSave, edit}) {
 
     return (
         <>
-            <form className={'form-addBday'}>
+            <form className='form-addBday'>
                 <label>First Name<ErrorBlock content={err.firstName}/>
                     <Input
-                        placeholder={'Enter first name..'}
+                        placeholder='Enter first name..'
                         value={data.firstName}
                         handleChange={(e) => {
                             setData({...data, firstName: e.target.value});
@@ -29,7 +32,7 @@ function FormBday({editData, onSave, edit}) {
                 </label>
                 <label>Last Name<ErrorBlock content={err.lastName}/>
                     <Input
-                        placeholder={'Enter last name..'}
+                        placeholder='Enter last name..'
                         value={data.lastName}
                         handleChange={(e) => {
                             setData({...data, lastName: e.target.value});
@@ -38,7 +41,7 @@ function FormBday({editData, onSave, edit}) {
                 </label>
                 <label>Date<ErrorBlock content={err.date}/>
                     <Input
-                        placeholder={'DD/MM/YYYY'}
+                        placeholder={dateFormat}
                         value={data.date}
                         handleChange={(e) => {
                             setData({...data, date: e.target.value});
@@ -48,8 +51,8 @@ function FormBday({editData, onSave, edit}) {
             </form>
             <Button onClick={() => {
                 //валидация и только потом закрытие формы и др
-                setErr(validation(data));
-                if (!validation(data).show) {
+                setErr(formBdayValidation(data));
+                if (!formBdayValidation(data).show) {
                     onSave(data);
                 }
 
@@ -61,32 +64,18 @@ function FormBday({editData, onSave, edit}) {
 
 export default FormBday;
 
-function validation(data) {
+export function formBdayValidation(data) {
     let err = {
         show: false,
         firstName: '',
         lastName: '',
         date: '',
     };
-    //валидация как на сервере
-    const reg = new RegExp('^[a-zA-Zа-яА-Я-]{2,30}$');
-    err.firstName = reg.test(data.firstName) ? '' : 'incorrect value';
-    err.lastName = reg.test(data.lastName) ? '' : 'incorrect value';
 
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(data.date)) {
-        if ((moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix() > 0) && (moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix() < 2147483648)) {
-            err.date = '';
-        } else {
-            err.date = 'incorrect value';
-        }
-    } else {
-        err.date = 'incorrect value (date format: DD/MM/YYYY)';
-    }
+    err.firstName = nameValidation(data.firstName);
+    err.lastName = nameValidation(data.lastName);
+    err.date = dateOfBdayValidation(data.date);
 
-    err.firstName = (data.firstName.length < 1) ? 'the field cannot be empty!' : err.firstName;
-    err.lastName = (data.lastName.length < 1) ? 'the field cannot be empty!' : err.lastName;
-    err.date = (data.date.length < 1) ? 'the field cannot be empty!' : err.date;
-
-    err.show = Boolean(err.firstName.length + err.lastName.length + err.date.length);
+    err.show = !isValidationSuccessful(err);
     return err;
 }

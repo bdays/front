@@ -5,6 +5,8 @@ import TextArea from "../TextArea";
 import Input from "../Input";
 import ErrorBlock from "../Error";
 import {compareObj} from "../../Utils/objects";
+import {blocksValidation, isValidationSuccessful, titleValidation} from "../../Utils/validation";
+import ButtonHelp from "../ButtonHelp";
 
 
 function FormTemplate({editData, onSave, edit}) {//если edit=true - Значит форма открыта для редактирования
@@ -16,11 +18,7 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
         blocks: '',
         attachments: '',
     });
-    const [blocks, setBlocks] = useState((JSON.stringify(data.blocks) === '[]') ? '' : JSON.stringify(data.blocks));
-
-    useEffect(() => {
-
-    });
+    const [blocks, setBlocks] = useState(JSON.stringify(data.blocks,null,"  "));
 
     function clickHelp(e) {
         e.preventDefault();
@@ -29,10 +27,10 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
 
     return (
         <>
-            <form className={'form-addTemplate'}>
+            <form className='form-addTemplate'>
                 <label>Title<ErrorBlock content={err.title}/>
                     <Input
-                        placeholder={'Enter template name..'}
+                        placeholder='Enter template name..'
                         value={data.title}
                         handleChange={(e) => {
                             setData({...data, title: e.target.value});
@@ -42,33 +40,28 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
 
                 <label>Text<ErrorBlock content={err.text}/>
                     <TextArea
-                        placeholder={'Enter text..'}
+                        placeholder='Enter text..'
                         value={data.text}
                         handleChange={(e) => {
                             setData({...data, text: e.target.value});
                             //setErr(validation({...data, text: e.target.value}, blocks, setData));
                         }}/>
-                </label><Button onClick={clickHelp} className="btn-help tooltip">?
-                <span
-                    className="tooltip-text">open page in new tab - "https://api.slack.com/tools/block-kit-builder"</span></Button>
-                <label>Blocks
+                </label>
+                <label>Blocks <ButtonHelp onClick={clickHelp} children='Open SLACK'
+                                          tooltipText='View template with Slack Block Kit Builder'/>
                     <ErrorBlock content={err.blocks}/> {/*проверять на json*/}
                     <TextArea
-                        className={'textarea-forJSON'}
-                        placeholder={'Insert JSON from "SLACK Block Kit Builder"'}
+                        className='textarea-forJSON'
+                        placeholder='Insert JSON from "SLACK Block Kit Builder"'
                         value={blocks}
                         handleChange={(e) => {
-                            //замена табуляций на два пробела - иначе скопированный с
-                            // block kit builder текст расползается и выглядит нечитабельным
-                            setBlocks(e.target.value.replace(/\u0009/g, "  "));
-                            //setErr(validation(data, e.target.value, setData));
-
+                            setBlocks(JSON.parse(JSON.stringify(e.target.value,null,"\u0009")));
                         }}/>
                 </label>
             </form>
             <Button onClick={() => {
-                setErr(validation(data, blocks, setData));
-                if (!validation(data, blocks, setData).show) {
+                setErr(formTemplateValidation(data, blocks, setData));
+                if (!formTemplateValidation(data, blocks, setData).show) {
                     let per = JSON.parse(blocks);
                     if (typeof per['blocks'] === "undefined") {//если поля blocks нет в объекте
                         per = {"blocks": per};
@@ -76,14 +69,14 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
                     onSave({...data, blocks: [].concat(per.blocks)});
                 }
             }}
-                    disabled={(compareObj(editData, data) && (edit) && (blocks === JSON.stringify(editData.blocks))) ? ('disabled') : ('')}
+                    disabled={(compareObj(editData, data) && (edit) && (blocks === JSON.stringify(editData.blocks,null,"  "))) ? ('disabled') : ('')}
                     className="btn-save">Save</Button></>
     );
 }
 
 export default FormTemplate;
 
-function validation(data, blocks, setData) {
+function formTemplateValidation(data, blocks, setData) {
     let err = {
         show: false,
         title: '',
@@ -92,27 +85,15 @@ function validation(data, blocks, setData) {
         attachments: '',
     };
 
-    err.title = (data.title.length < 1) ? 'the field cannot be empty!' : err.title;
-    err.text = (data.text.length < 1) ? 'the field cannot be empty!' : err.text;
-    err.blocks = (blocks.length < 1) ? 'the field cannot be empty!' : err.blocks;
+    err.title = titleValidation(data.title);
+    err.text = titleValidation(data.text);
 
-    try {
-        let per = JSON.parse(blocks);
-        if (typeof per['blocks'] === "undefined") {//если поля blocks нет в объекте
-            //err.blocks = 'JSON format: {"blocks":[{},{},...,{}]}';
-            per = {"blocks": per};
-        }
-        setData({...data, blocks: [].concat(per.blocks)});
-    } catch (e) {
-        err.blocks = 'JSON error';// + e;
-        try {
-            setData({...data, blocks: []});
-        } catch (e) {
+    const blocksValid = blocksValidation(blocks);
 
-        }
-    }
+    err.blocks = blocksValid.err;
+    setData({...data, blocks: [].concat(blocksValid.blocks)});
 
-    err.show = Boolean(err.title.length + err.text.length + err.blocks.length + err.attachments.length);
+    err.show = !isValidationSuccessful(err);
     return err;
 }
 

@@ -1,7 +1,6 @@
 import React, {useCallback, useState} from 'react';
 import {Link, useLocation,} from 'react-router-dom';
 import {useDispatch} from "react-redux";
-import moment from "moment";
 
 import './style.scss';
 
@@ -13,15 +12,16 @@ import Modal from "../../components/Modal";
 import FormBday from "../../components/FormBday";
 import SnackBar from "../../components/SnackBar";
 import FormTemplate from "../../components/FormTemplate";
+import {dateToUnix} from "../../Utils/date";
 
 export default function () {
+    let location = useLocation();
+    const dispatch = useDispatch();
+
     const [showModalBday, setShowModalBday] = useState(false);
     const [showModalTemplate, setShowModalTemplate] = useState(false);
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [snackBarContent, setSnackBarContent] = useState('');
-
-    let location = useLocation();
-    const dispatch = useDispatch();
 
     const handleAddBday = useCallback((data) => {
         dispatch(calendarAddBday(data)).then((resp) => {
@@ -64,15 +64,15 @@ export default function () {
 
     return (
         <>
-            <Modal show={showModalBday} header={'Add birthday'}
+            <Modal show={showModalBday} header='Add birthday'
                    content={<FormBday editData={{firstName: '', lastName: '', data: {}, date: ''}} onSave=
                        {(data) => {
-                           handleAddBday({...data, date: moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix()});
+                           handleAddBday({...data, date: dateToUnix(data.date)});
                            setShowModalBday(false);
                        }}
                    />} toClose={() => setShowModalBday(false)}/>
 
-            <Modal show={showModalTemplate} header={'Add template'}
+            <Modal show={showModalTemplate} header='Add template'
                    content={<FormTemplate editData={{title: '', text: '', blocks: [], attachments: []}} onSave=
                        {(data) => {
                            handleAddTemplate(data);
@@ -85,7 +85,7 @@ export default function () {
             <div className='router'>
                 <ul>
                     <li>
-                        <img src={imgBday} alt={'Bday'}/>
+                        <img src={imgBday} alt='Bday'/>
                     </li>
                     <li>
                         <Link to="/" className={('/' === location.pathname) ? 'active' : ''}>Main</Link>

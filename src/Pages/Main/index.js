@@ -1,24 +1,23 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
-import moment from "moment";
 
 import './style.scss';
 
 import {calendarFetchListOfBdays, calendarDeleteBday, calendarEditBday} from '../../Reducers/calendar';
 
-import Calendar from "../../components/calendar";
-import Table from "../../components/table";
+import Calendar from "../../components/Calendar";
+import Table from "../../components/Table";
 import Button from "../../components/Button";
 import FormBday from "../../components/FormBday";
 import Modal from "../../components/Modal";
 import SnackBar from "../../components/SnackBar";
+import {dateToUnix, getCurrentDate, getDate, getLastMonth, getNextMonth} from "../../Utils/date";
 
 function MainPage() {
-    const {payload} = useSelector(state => state.calendar.list, shallowEqual);
-    const isLoading = useSelector(state => state.calendar.list.isLoading, shallowEqual);
+    const {payload,isLoading} = useSelector(state => state.calendar.list, shallowEqual);
     const dispatch = useDispatch();
 
-    const [dateForCalendar, setDateForCalendar] = useState(moment());
+    const [dateForCalendar, setDateForCalendar] = useState(getCurrentDate());
     const [showModal, setShowModal] = useState(false);//модалка для редактирования ДР
     const [editData, setEditData] = useState({id: null, firstName: '', lastName: '', data: {}, date: ''});//редактируемые данные, которые отобажаются в модалке
     const [showSnackBar, setShowSnackBar] = useState(false);
@@ -59,15 +58,15 @@ function MainPage() {
     //формирование массива "важных дат" для календаря
     let importantDates;
     try {
-        importantDates = payload[dateForCalendar.format('MMMM')].map((item) => {
+        importantDates = payload[getDate(dateForCalendar,'MMMM')].map((item) => {
             return item['day'];
         });
 
         if (!isLoading) {
             tablePattern.content = [];
             //выводим дни рождения только того месяца, который отображен на календаре
-            payload[dateForCalendar.format('MMMM')].forEach((subItem, subIndex) => {
-                let action = [<Button key={'ButtonEdit' + subIndex} children={'Edit'} className={"btnEdit"}
+            payload[getDate(dateForCalendar,'MMMM')].forEach((subItem, subIndex) => {
+                let action = [<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
                                       onClick={() => {
                                           setShowModal(true);
                                           setEditData({
@@ -78,7 +77,7 @@ function MainPage() {
                                               date: ''
                                           })
                                       }}/>,
-                    <Button key={'ButtonDelete' + subIndex} children={'Delete'} className={"btn-delete"}
+                    <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
                             onClick={() => {
                                 setShowSimpleModal(true);
                                 setCurrentId(subItem['id']);
@@ -110,26 +109,26 @@ function MainPage() {
     return <div>
         <Modal
             show={showModal}
-            header={'Edit birthday'}
+            header='Edit birthday'
             content={
                 <FormBday edit={true} onSave={(data) => {
                     handleEdit(data.id, {
                         firstName: data.firstName,
                         lastName: data.lastName,
                         data: data.data,
-                        date: moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix(),
+                        date: dateToUnix(data.date),
                     });
                     setShowModal(false);
                 }} editData={editData}/>
             }
             toClose={() => setShowModal(false)}
         />
-        <Modal show={showSimpleModal} header={'Delete'}
+        <Modal show={showSimpleModal} header='Delete'
                content={<>You sure?
-                   <Button className={'btn-modal-yes'}
-                           children={'No'}
+                   <Button className='btn-modal-yes'
+                           children='No'
                            onClick={() => setShowSimpleModal(false)}/>
-                   <Button className={'btn-modal-yes'} children={'Yes'}
+                   <Button className='btn-modal-yes' children='Yes'
                            onClick={() => handleDelete(currentId)}/>
                </>}
                toClose={() => setShowSimpleModal(false)}/>
@@ -140,8 +139,8 @@ function MainPage() {
         <Calendar date={dateForCalendar}
                   importantDates={importantDates}
                   classNameCursor={isLoading ? 'waitCursor' : ''}
-                  clickPrevButton={() => setDateForCalendar(moment(dateForCalendar.subtract(1, 'months').format('DD/MM/YYYY'), 'DD/MM/YYYY'))}
-                  clickNextButton={() => setDateForCalendar(moment(dateForCalendar.add(1, 'months').format('DD/MM/YYYY'), 'DD/MM/YYYY'))}/>
+                  clickPrevButton={() => setDateForCalendar(getLastMonth(dateForCalendar))}
+                  clickNextButton={() => setDateForCalendar(getNextMonth(dateForCalendar))}/>
         <br/>
         <Table
             classNameTable={tablePattern.classNameTable}

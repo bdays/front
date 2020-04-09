@@ -14,15 +14,15 @@ class CalendarService {
     }
 
     deleteBday(id) {
-        return deleteBday(id).then(res => res);
+        return deleteBday(id);
     }
 
     addBday(data) {
-        return addBday(data).then(res => res);
+        return addBday(data);
     }
 
     editBday(id, data) {
-        return editBday(id, data).then(res => res);
+        return editBday(id, data);
     }
 
     ///////////
@@ -32,17 +32,17 @@ class CalendarService {
     }
 
     addTemplate(data) {
-        return addTemplate(data).then(res => res);
+        return addTemplate(data);
     }
 
     deleteTemplate(id) {
-        return deleteTemplate(id).then(res => res);
+        return deleteTemplate(id);
     }
     fetchTemplate(id) {
         return getTemplate(id).then(res => res.data);
     }
     editTemplate(id, data) {
-        return editTemplate(id, data).then(res => res);
+        return editTemplate(id, data);
     }
 
     getTemplateWithBday(templateId,bdayId) {
