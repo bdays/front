@@ -84,16 +84,10 @@ tr:hover {
   table {
     font-size: 13px !important;
   }
-  .heading {
-    font-size: 13px !important;
-  }
 }
 
 @media only screen and (max-width: 600px) {
-  table {
-    font-size: 10px !important;
-  }
-  .heading {
+  *{
     font-size: 10px !important;
   }
 }

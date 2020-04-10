@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
@@ -19,10 +19,11 @@ import SnackBar from "../../components/SnackBar";
 import Spinner from "../../components/Spinners";
 import ButtonGroup from "../../components/ButtonGroup";
 import ListOfBdays from "../../components/ListOfBdays";
+import {getCell} from "../../Utils/table";
 
 export default function () {
     const dispatch = useDispatch();
-    const {payload,isLoading} = useSelector(state => state.templates.list, shallowEqual);
+    const {payload, isLoading} = useSelector(state => state.templates.list, shallowEqual);
     const template = useSelector(state => state.templates.template, shallowEqual);
     const templateWithBday = useSelector(state => state.templates.templateWithBday, shallowEqual);
 
@@ -70,7 +71,7 @@ export default function () {
                 onClick: () => {
                     setActiveButton(open);
                 },
-                active: ((activeButton===open)||(activeButton===openTemplateWithBday)),
+                active: ((activeButton === open) || (activeButton === openTemplateWithBday)),
                 disabled: false,
             },
             {
@@ -104,11 +105,7 @@ export default function () {
     }, []);
 
     const handleGetTemplateWithBday = useCallback((templateId, bdayId) => {
-        dispatch(calendarFetchTemplateWithBday(templateId, bdayId)).then(() => {
-
-        }).catch(() => {
-            //обработать возможные ошибки
-        })
+        dispatch(calendarFetchTemplateWithBday(templateId, bdayId));
     }, []);
 
     const handleEditTemplate = useCallback((id, data) => {
@@ -131,73 +128,60 @@ export default function () {
         })
     }, []);
 
-    if (!isLoading) {
-        tablePattern.content = [];
-        try {
-            payload.forEach((item, index) => {
-                let action = [<Button key={'ButtonShow' + index} children="Show" className="btnEdit"
-                                      onClick={() => {
-                                          setActiveButton(show);
-                                          if (!collapseTableOfTemplates) (setCollapseTableOfTemplates(true));
-                                          if (currentId === item.id) {
-                                              setCollapseTableOfTemplates(!collapseTableOfTemplates);
-                                          }
+    const tableOfTemplates = useMemo(() => (payload && !isLoading) ?
+        getTableOfTemplate() : []
+        , [payload, currentId, collapseTableOfTemplates]);
 
-                                          setCurrentId(item.id);
-                                          handleGetTemplate(item.id);
-                                      }}/>,
-                    <Button key={'ButtonDelete' + index} children="×" className={"btn-delete-x"}
-                            onClick={() => {
-                                setCurrentId(item.id);
-                                setShowSimpleModal(true);
-                            }}/>];
+    const rightPanel = useMemo(() => (collapseTableOfTemplates) ?
+        getRightPanel() : ''
+        , [templateWithBday, template, currentId, collapseTableOfTemplates, activeButton]);
 
-                if (collapseTableOfTemplates) {
-                    action = []
-                }
-                tablePattern.content.push([
-                    {
-                        name: 'number',
-                        className: 'td-sm',
-                        children: index + 1,
-                        classNameRow: ((currentId === item.id) && (collapseTableOfTemplates))? 'trActive' : '',
-                    },
-                    {
-                        name: 'name',
-                        children: item.title,
-                        className: 'th-l',
-                        onClickRow: () => {
-                            setActiveButton(show);
-                            if (!collapseTableOfTemplates) {
-                                setCollapseTableOfTemplates(true);
-                            }
-                            if (currentId === item.id) {
-                                setCollapseTableOfTemplates(!collapseTableOfTemplates);
-                            }
-                            handleGetTemplate(item.id);
+    function getTableOfTemplate() {
+        return Object.values(payload).map((item, index) => {
+            let action = (collapseTableOfTemplates) ? [] : [<Button key={'ButtonShow' + index} children="Show"
+                                                                    className="btnEdit"
+                                                                    onClick={() => {
+                                                                        setActiveButton(show);
+                                                                        if (!collapseTableOfTemplates) (setCollapseTableOfTemplates(true));
+                                                                        if (currentId === item.id) {
+                                                                            setCollapseTableOfTemplates(!collapseTableOfTemplates);
+                                                                        }
+
+                                                                        setCurrentId(item.id);
+                                                                        handleGetTemplate(item.id);
+                                                                    }}/>,
+                <Button key={'ButtonDelete' + index} children="×" className={"btn-delete-x"}
+                        onClick={() => {
                             setCurrentId(item.id);
+                            setShowSimpleModal(true);
+                        }}/>];
+            return [
+                getCell('td-sm', index + 1, null, ((currentId === item.id) && (collapseTableOfTemplates)) ? 'trActive' : ''),
+                getCell('th-l', item.title, null, null, () => {
+                    setActiveButton(show);
+                    if (!collapseTableOfTemplates) {
+                        setCollapseTableOfTemplates(true);
+                    }
+                    if (currentId === item.id) {
+                        setCollapseTableOfTemplates(!collapseTableOfTemplates);
+                    }
+                    handleGetTemplate(item.id);
+                    setCurrentId(item.id);
 
-                        }
-                    },
-                    {
-                        name: 'action',
-                        className: 'td-action',
-                        children: action,
-                    },
-                ])
-            });
-        } catch (e) {
-        }
+                }),
+                getCell('td-action', action),
+            ];
+        })
     }
 
-    let rightPanel;
-    if (collapseTableOfTemplates) {//если наадо показывать правую часть экрана
+    function getRightPanel() {
         let tabContent;
         switch (activeButton) {
             case openTemplateWithBday:
                 tabContent = (templateWithBday.isLoading ? <Spinner className='loader2'/> :
-                    [<Button key="buttonBack" className='button-go' children='<< Back' onClick={()=>setActiveButton(open)}/>
-                    ,<ShowTemplate key='ShowBack' payload={templateWithBday.payload}/>]);
+                    [<Button key="buttonBack" className='button-go' children='<< Back'
+                             onClick={() => setActiveButton(open)}/>
+                        , <ShowTemplate key='ShowBack' payload={templateWithBday.payload}/>]);
                 break;
             case open:
                 tabContent = (<ListOfBdays onClickGo={(id) => {
@@ -212,12 +196,10 @@ export default function () {
                 break;
         }
 
-        rightPanel = (<div className='div-panel-right'>
+        return (<div className='div-panel-right'>
             <ButtonGroup buttonGroup={buttonGroup}/>
             {tabContent}
         </div>);
-    } else {
-        rightPanel = '';
     }
 
     return (
@@ -241,10 +223,12 @@ export default function () {
                    toClose={() => setShowSimpleModal(false)}/>
             <SnackBar show={showSnackBar} content={snackBarContent}/>
 
-            <div className={(collapseTableOfTemplates) ? 'div-panel-left' : ''}><Table
-                classNameTable={tablePattern.classNameTable} classNameTableHead={tablePattern.classNameTableHead}
-                header={tablePattern.header} content={tablePattern.content}
-                isLoading={isLoading}/></div>
+            <div className={(collapseTableOfTemplates) ? 'div-panel-left' : ''}>
+                <Table
+                    classNameTable='table-ofTemplates'
+                    header={header} content={tableOfTemplates}
+                    isLoading={isLoading}/>
+            </div>
             {rightPanel}
         </div>
     );
@@ -257,13 +241,7 @@ const del = 'Delete';
 const open = 'Open with Bday';
 const openTemplateWithBday = 'openTemplateWithBday';
 
-let tablePattern = {
-    classNameTable: 'table-ofTemplates',
-    classNameTableHead: '',
-    header: [
-        {name: 'number', alias: '№', className: 'heading'},
-        {name: 'name', alias: 'Name', className: 'heading'},
-        {name: 'action', alias: '', className: 'heading'},
-    ],
-    content: []
-};
+const header = [{name: 'number', alias: '№', className: 'heading'},
+    {name: 'name', alias: 'Name', className: 'heading'},
+    {name: 'action', alias: '', className: 'heading'},];
+

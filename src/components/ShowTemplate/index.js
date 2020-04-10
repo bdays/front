@@ -2,6 +2,7 @@ import React, {} from "react";
 import './style.scss';
 import ButtonHelp from "../ButtonHelp";
 import TextArea from "../TextArea";
+import {Slack_Block_Kit_Builder_URL} from "../../Utils/constants";
 
 function ShowTemplate({payload}) {
 
@@ -16,15 +17,19 @@ function ShowTemplate({payload}) {
             <p>{payload.text}</p>
         </blockquote>
         <p><b>BLOCKS:</b>
-            <ButtonHelp onClick={()=>{window.open('https://api.slack.com/tools/block-kit-builder?mode=message&blocks='
-                + encodeURIComponent(JSON.stringify(payload.blocks)));}} children='Open in SLACK'
+            <ButtonHelp onClick={() => {
+                const url = new URL(Slack_Block_Kit_Builder_URL);
+                url.searchParams.set("mode", "message");
+                url.searchParams.set("blocks", JSON.stringify(payload.blocks));
+                window.open(url.toString());
+            }} children='Open in SLACK'
                         tooltipText='View template with Slack Block Kit Builder'/>
         </p>
         <TextArea
             className='textarea-forJSON'
-            value={JSON.stringify(payload.blocks,null,"  ")}
+            value={JSON.stringify(payload.blocks, null, "  ")}
             readOnly={true}
-           />
+        />
 
     </div>);
 }

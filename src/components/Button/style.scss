@@ -87,6 +87,7 @@ button {
 
 .btn-help {
   padding: 2px 6px 2px 6px;
+  float: right;
 }
 
 /* Контейнер подсказок */
@@ -113,8 +114,9 @@ button {
   padding: 5px;
   border-radius: 6px;
   white-space: nowrap;
-  top: -15px;
-  left: 115%;
+  top: -30px;
+  right: 10%;
+  //left: 115%;
   position: absolute;
   z-index: 1;
 }

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
@@ -12,9 +12,10 @@ import FormBday from "../../components/FormBday";
 import Modal from "../../components/Modal";
 import SnackBar from "../../components/SnackBar";
 import {dateToUnix, getCurrentDate, getDate, getLastMonth, getNextMonth} from "../../Utils/date";
+import {getCell} from "../../Utils/table";
 
 function MainPage() {
-    const {payload,isLoading} = useSelector(state => state.calendar.list, shallowEqual);
+    const {payload, isLoading} = useSelector(state => state.calendar.list, shallowEqual);
     const dispatch = useDispatch();
 
     const [dateForCalendar, setDateForCalendar] = useState(getCurrentDate());
@@ -55,56 +56,48 @@ function MainPage() {
         })
     }, []);
 
-    //формирование массива "важных дат" для календаря
-    let importantDates;
-    try {
-        importantDates = payload[getDate(dateForCalendar,'MMMM')].map((item) => {
-            return item['day'];
+    const listOfBdays = useMemo(() => (payload && !isLoading) ?
+        getListOfBdays() : []
+        , [payload, currentId,dateForCalendar]);
+
+    const importantDates = useMemo(() => (payload && !isLoading) ?
+        getImportantDates() : []
+        , [payload,dateForCalendar]);
+
+
+    function getImportantDates() {
+        return payload[getDate(dateForCalendar, 'MMMM')].map((item) => {
+            return item['day'];//формирование массива "важных дат" для календаря
         });
-
-        if (!isLoading) {
-            tablePattern.content = [];
-            //выводим дни рождения только того месяца, который отображен на календаре
-            payload[getDate(dateForCalendar,'MMMM')].forEach((subItem, subIndex) => {
-                let action = [<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
-                                      onClick={() => {
-                                          setShowModal(true);
-                                          setEditData({
-                                              id: subItem.id,
-                                              firstName: subItem.firstName,
-                                              lastName: subItem.lastName,
-                                              data: {},
-                                              date: ''
-                                          })
-                                      }}/>,
-                    <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
-                            onClick={() => {
-                                setShowSimpleModal(true);
-                                setCurrentId(subItem['id']);
-                            }}/>];
-
-                tablePattern.content.push([
-                    {
-                        name: 'date', className: 'td-m',
-                        children: subItem.day,
-                    },
-                    {
-                        name: 'name',
-                        children: subItem.fullName,
-                        className: 'th-l',
-                    },
-                    {
-                        name: 'action',
-                        className: 'td-action',
-                        children: action,
-                    }
-                ])
-            });
-
-        }
-    } catch (e) {
-        importantDates = [];
     }
+
+    function getListOfBdays() {
+        return payload[getDate(dateForCalendar, 'MMMM')].map((item, index) => {
+            let action = [<Button key={'ButtonEdit' + index} children='Edit' className="btnEdit"
+                                  onClick={() => {
+                                      setShowModal(true);
+                                      setEditData({
+                                          id: item.id,
+                                          firstName: item.firstName,
+                                          lastName: item.lastName,
+                                          data: {},
+                                          date: ''
+                                      })
+                                  }}/>,
+                <Button key={'ButtonDelete' + index} children='Delete' className="btn-delete"
+                        onClick={() => {
+                            setShowSimpleModal(true);
+                            setCurrentId(item['id']);
+                        }}/>];
+
+            return [
+                getCell('td-m', item.day),
+                getCell('th-l', item.fullName),
+                getCell('td-action', action),
+            ];
+        })
+    }
+
 
     return <div>
         <Modal
@@ -143,10 +136,10 @@ function MainPage() {
                   clickNextButton={() => setDateForCalendar(getNextMonth(dateForCalendar))}/>
         <br/>
         <Table
-            classNameTable={tablePattern.classNameTable}
-            classNameTableHead={tablePattern.classNameTableHead}
-            header={tablePattern.header}
-            content={tablePattern.content}
+            classNameTable=''
+            classNameTableHead=''
+            header={header}
+            content={listOfBdays}
             isLoading={isLoading}
         />
 
@@ -154,13 +147,8 @@ function MainPage() {
 }
 
 export default MainPage;
-
-let tablePattern = {
-    classNameTable: '',
-    classNameTableHead: '',
-    header: [
-        {name: 'date', alias: 'Day', className: 'td-sm'},
-        {name: 'fullName', alias: 'Name', className: 'td-l'},
-        {name: 'action', alias: '', className: 'td-action'},],
-    content: []
-};
+const header = [
+    {name: 'date', alias: 'Day', className: 'td-sm'},
+    {name: 'fullName', alias: 'Name', className: 'td-l'},
+    {name: 'action', alias: '', className: 'td-action'},
+];

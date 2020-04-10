@@ -1,5 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import './style.scss'
+import React, {useState} from 'react';
+
+import './style.scss';
+
+import {Slack_Block_Kit_Builder_URL} from "../../Utils/constants";
+
 import Button from "../Button";
 import TextArea from "../TextArea";
 import Input from "../Input";
@@ -7,7 +11,6 @@ import ErrorBlock from "../Error";
 import {compareObj} from "../../Utils/objects";
 import {blocksValidation, isValidationSuccessful, titleValidation} from "../../Utils/validation";
 import ButtonHelp from "../ButtonHelp";
-
 
 function FormTemplate({editData, onSave, edit}) {//если edit=true - Значит форма открыта для редактирования
     const [data, setData] = useState(editData);
@@ -18,11 +21,14 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
         blocks: '',
         attachments: '',
     });
-    const [blocks, setBlocks] = useState(JSON.stringify(data.blocks,null,"  "));
+    const [blocks, setBlocks] = useState((edit)?JSON.stringify(data.blocks, null, "  "):'');
 
     function clickHelp(e) {
         e.preventDefault();
-        window.open('https://api.slack.com/tools/block-kit-builder');
+        const url = new URL(Slack_Block_Kit_Builder_URL);
+        url.searchParams.set("mode", "message");
+        url.searchParams.set("blocks", (edit) ? blocks : '[]');
+        window.open(url.toString());
     }
 
     return (
@@ -47,17 +53,19 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
                             //setErr(validation({...data, text: e.target.value}, blocks, setData));
                         }}/>
                 </label>
-                <label>Blocks <ButtonHelp onClick={clickHelp} children='Open SLACK'
-                                          tooltipText='View template with Slack Block Kit Builder'/>
-                    <ErrorBlock content={err.blocks}/> {/*проверять на json*/}
-                    <TextArea
-                        className='textarea-forJSON'
-                        placeholder='Insert JSON from "SLACK Block Kit Builder"'
-                        value={blocks}
-                        handleChange={(e) => {
-                            setBlocks(JSON.parse(JSON.stringify(e.target.value,null,"\u0009")));
-                        }}/>
+                <label>Blocks
                 </label>
+                <ButtonHelp onClick={clickHelp} children='Open SLACK'
+                            tooltipText={edit ? 'View template with Slack Block Kit Builder' : 'Open Slack Block Kit Builder'}/>
+                <ErrorBlock content={err.blocks}/> {/*проверять на json*/}
+
+                <TextArea
+                    className='textarea-forJSON'
+                    placeholder='Insert JSON from "SLACK Block Kit Builder"'
+                    value={blocks}
+                    handleChange={(e) => {
+                        setBlocks(JSON.parse(JSON.stringify(e.target.value, null, "  ")));
+                    }}/>
             </form>
             <Button onClick={() => {
                 setErr(formTemplateValidation(data, blocks, setData));
@@ -69,7 +77,7 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
                     onSave({...data, blocks: [].concat(per.blocks)});
                 }
             }}
-                    disabled={(compareObj(editData, data) && (edit) && (blocks === JSON.stringify(editData.blocks,null,"  "))) ? ('disabled') : ('')}
+                    disabled={(compareObj(editData, data) && (edit) && (blocks === JSON.stringify(editData.blocks, null, "  "))) ? ('disabled') : ('')}
                     className="btn-save">Save</Button></>
     );
 }

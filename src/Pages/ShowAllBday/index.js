@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
@@ -56,57 +56,78 @@ function ShowAllBdayPage() {
         })
     }, []);
 
-    let table = [];
+    const table = useMemo(() => {
+            return (payload && !isLoading) ?
+                ((viewMode)?getTableForViewMode(payload):getDefaultTable(payload))
+                : (<Table key='mainTable'
+                          header={[]}
+                          content={[]}
+                          isLoading={true}/>)}
+        , [payload,viewMode]);
 
-    if (!isLoading) {
-        table = [];
-        tablePattern.content = [];
-        if (viewMode) {//VIEW MODE
-            table = getTableForViewMode(payload);
-        } else {
-            for (const item in payload) {
-                if (payload[item].length > 0) {//пишем название месяца только если там есть ДР
-                    tablePattern.content.push([
-                        getCell('heading', item, 3),
-                    ]);
-                }
-                payload[item].forEach((subItem, subIndex) => {
-                    let action = [<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
-                                          onClick={() => {
-                                              setShowModal(true);
-                                              setEditData({
-                                                  id: subItem.id,
-                                                  firstName: subItem.firstName,
-                                                  lastName: subItem.lastName,
-                                                  data: {},
-                                                  date: ''
-                                              })
-                                          }}/>,
-                        <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
-                                onClick={() => {
-                                    setCurrentId(subItem.id);
-                                    setShowSimpleModal(true);
-                                }}/>];
-
-                    tablePattern.content.push([
-                        getCell('td-m', subItem.day, null),
-                        getCell('th-l', subItem.fullName, null),
-                        getCell('td-action', action, null),
-                    ]);
-                });
+    function getDefaultTable(payload) {
+        let tableContent = [];
+        for (const item in payload) {
+            if (payload[item].length > 0) {//пишем название месяца только если там есть ДР
+                tableContent.push([
+                    getCell('heading', item, 3),
+                ]);
             }
-            table.push(<Table key='mainTable' classNameTable={tablePattern.classNameTable}
-                              classNameTableHead={tablePattern.classNameTableHead}
-                              header={tablePattern.header} content={tablePattern.content}
-                              isLoading={isLoading}/>);
-        }
+            payload[item].forEach((subItem, subIndex) => {
+                let action = [<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
+                                      onClick={() => {
+                                          setShowModal(true);
+                                          setEditData({
+                                              id: subItem.id,
+                                              firstName: subItem.firstName,
+                                              lastName: subItem.lastName,
+                                              data: {},
+                                              date: ''
+                                          })
+                                      }}/>,
+                    <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
+                            onClick={() => {
+                                setCurrentId(subItem.id);
+                                setShowSimpleModal(true);
+                            }}/>];
 
-    } else {
-        //вывести спиннер, если данные с сервера еще не подгрузились
-        table.push(<Table key='mainTable' classNameTable={tablePattern.classNameTable}
-                          classNameTableHead={tablePattern.classNameTableHead}
-                          header={tablePattern.header} content={tablePattern.content}
+                tableContent.push([
+                    getCell('td-m', subItem.day, null),
+                    getCell('th-l', subItem.fullName, null),
+                    getCell('td-action', action, null),
+                ]);
+            });
+        }
+        return (<Table key='mainTable'
+                          header={[]} content={tableContent}
                           isLoading={isLoading}/>);
+    }
+
+    function getTableForViewMode(payload) {
+        const maxBdaysInMonth = getMaxBdaysInMonth(payload);
+        let table = [];
+        let per = 0;
+
+        for (const item in payload) {
+            let tableContent = [];
+            tableContent.push([getCell('heading', item, 2)]);
+
+            for (let i = 0; i < maxBdaysInMonth[~~(per / 3)]; i++) {
+
+                tableContent.push([
+                    getCell('td-m', (payload[item][i]) ? payload[item][i].day : '\u00A0', null),
+                    getCell('td-l', (payload[item][i]) ? payload[item][i].fullName : '\u00A0', null),
+                ]);
+            }
+            table.push(<Table key={'table' + item}
+                              classNameTable='table-viewMode'
+                              classNameBlock='div-forViewMode'
+                              classNameTableHead='heading'
+                              header={[]} content={tableContent}
+                              isLoading={false}/>);
+            per++;
+        }
+        return table;
     }
 
     return <div>
@@ -139,42 +160,6 @@ function ShowAllBdayPage() {
 }
 
 export default ShowAllBdayPage;
-
-let tablePattern = {
-    classNameTable: '',
-    classNameTableHead: '',
-    header: [],
-    content: []
-};
-
-function getTableForViewMode(payload) {
-    const maxBdaysInMonth = getMaxBdaysInMonth(payload);
-    let table = [];
-    let per = 0;
-
-    for (const item in payload) {
-        tablePattern.content = [];
-        tablePattern.content.push([getCell('heading', item, 2)]);
-
-        for (let i = 0; i < maxBdaysInMonth[~~(per / 3)]; i++) {
-
-            tablePattern.content.push([
-                getCell('td-m', (payload[item][i]) ? payload[item][i].day : '\u00A0', null),
-                getCell('td-l', (payload[item][i]) ? payload[item][i].fullName : '\u00A0', null),
-            ]);
-        }
-        table.push(<Table key={'table' + item}
-                          classNameTable='table-viewMode'
-                          classNameBlock='div-forViewMode'
-                          classNameTableHead='heading'
-                          header={[]} content={tablePattern.content}
-                          isLoading={false}/>);
-        per++;
-    }
-    return table;
-}
-
-
 
 function getMaxBdaysInMonth(payload) {
     //возвращается [a,b,c,d], где абсд - максимальные кол-ва др
