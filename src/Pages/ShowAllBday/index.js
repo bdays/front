@@ -3,7 +3,7 @@ import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
 
-import {calendarDeleteBday, calendarFetchListOfBdays, calendarEditBday} from '../../Reducers/calendar';
+import {calendarDeleteBday, calendarFetchListOfBdays, calendarEditBday} from '../../Reducers/birthdays';
 
 import Table from "../../components/Table";
 import Button from "../../components/Button";
@@ -14,7 +14,7 @@ import {dateToUnix} from "../../Utils/date";
 import {getCell} from "../../Utils/table";
 
 function ShowAllBdayPage() {
-    const {payload, isLoading} = useSelector(state => state.calendar.list, shallowEqual);
+    const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const dispatch = useDispatch();
 
     const [editData, setEditData] = useState({id: null, firstName: '', lastName: '', data: {}, date: ''});//редактируемые данные, которые отобажаются в модалке

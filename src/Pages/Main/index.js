@@ -3,7 +3,7 @@ import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
 
-import {calendarFetchListOfBdays, calendarDeleteBday, calendarEditBday} from '../../Reducers/calendar';
+import {calendarFetchListOfBdays, calendarDeleteBday, calendarEditBday} from '../../Reducers/birthdays';
 
 import Calendar from "../../components/Calendar";
 import Table from "../../components/Table";
@@ -15,7 +15,7 @@ import {dateToUnix, getCurrentDate, getDate, getLastMonth, getNextMonth} from ".
 import {getCell} from "../../Utils/table";
 
 function MainPage() {
-    const {payload, isLoading} = useSelector(state => state.calendar.list, shallowEqual);
+    const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const dispatch = useDispatch();
 
     const [dateForCalendar, setDateForCalendar] = useState(getCurrentDate());

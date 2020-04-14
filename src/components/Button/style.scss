@@ -61,7 +61,7 @@ button {
   font-size: 24px;
   font-weight: 700;
   line-height: 1;
-  color: #000;
+  color: #000000;
   text-shadow: 0 1px 0 #fff;
   opacity: .5;
   text-decoration: none;
@@ -73,7 +73,18 @@ button {
     opacity: .75;
   }
 }
+.btn-continue{
+  background-color: #4870fa;
+  border: 1px solid #4870fa;
+  color: #ffffff;
+  font-size: 16px;
+  padding: 6px 12px 6px 12px;
 
+  &:hover {
+    background-color: white;
+    border: 1px solid #4870fa;
+  }
+}
 .btn-viewMode {
   float: right;
   font-family: sans-serif;

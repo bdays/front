@@ -5,14 +5,17 @@ import {useDispatch} from "react-redux";
 import './style.scss';
 
 import {calendarAddTemplate, calendarFetchListOfTemplates} from "../../Reducers/templates";
-import {calendarAddBday, calendarFetchListOfBdays} from "../../Reducers/calendar";
+import {calendarAddBday, calendarFetchListOfBdays} from "../../Reducers/birthdays";
+import CalendarService from "../../Services/CalendarService";
 
 import imgBday from '../../image/iconBday.png';
+import imgSignIn from '../../image/icon-sign-in.png';
 import Modal from "../../components/Modal";
 import FormBday from "../../components/FormBday";
 import SnackBar from "../../components/SnackBar";
 import FormTemplate from "../../components/FormTemplate";
 import {dateToUnix} from "../../Utils/date";
+import FormAuthorization from "../../components/FormAuthorization";
 
 export default function () {
     let location = useLocation();
@@ -22,6 +25,7 @@ export default function () {
     const [showModalTemplate, setShowModalTemplate] = useState(false);
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [snackBarContent, setSnackBarContent] = useState('');
+    const [showModalAuthorization, setShowModalAuthorization] = useState(false);
 
     const handleAddBday = useCallback((data) => {
         dispatch(calendarAddBday(data)).then((resp) => {
@@ -29,14 +33,14 @@ export default function () {
             if (resp.ok) {
                 setSnackBarContent('Birthday successfully added');
             } else {
-                setSnackBarContent('Error: '+resp.statusText);
+                setSnackBarContent('Error: ' + resp.statusText);
             }
             setShowSnackBar(true);
             setTimeout(() => setShowSnackBar(false), 3000);
             dispatch(calendarFetchListOfBdays());
 
         }).catch((err) => {
-            setSnackBarContent('Error: '+err);
+            setSnackBarContent('Error: ' + err);
             setShowSnackBar(true);
             setTimeout(() => setShowSnackBar(false), 3000);
 
@@ -49,7 +53,7 @@ export default function () {
             if (resp.ok) {
                 setSnackBarContent('Template successfully added');
             } else {
-                setSnackBarContent('Error: '+resp.statusText);
+                setSnackBarContent('Error: ' + resp.statusText);
             }
 
             setShowSnackBar(true);
@@ -80,12 +84,22 @@ export default function () {
                        }}
                    />} toClose={() => setShowModalTemplate(false)}/>
 
+            <Modal show={showModalAuthorization} header='Authorization'
+                   content={<FormAuthorization onContinueAsGuest={() => console.log('continue')}
+                                               onSignIn={(data) => CalendarService.logIn(data).then(res => {
+                                                   if (res.data) {
+                                                       saveToken(res.data.token);
+                                                       setShowModalAuthorization(false);
+                                                   }
+                                               })} toClose={() => setShowModalAuthorization(false)}/>}
+                   toClose={() => setShowModalAuthorization(false)}/>
+
             <SnackBar show={showSnackBar} content={snackBarContent}/>
 
             <div className='router'>
                 <ul>
                     <li>
-                        <img src={imgBday} alt='Bday'/>
+                        <img className='icon-bDay' src={imgBday} alt='Bday'/>
                     </li>
                     <li>
                         <Link to="/" className={('/' === location.pathname) ? 'active' : ''}>Main</Link>
@@ -108,9 +122,20 @@ export default function () {
                         </div>
 
                     </li>
+                    <li className='li-img-login'>
+                        <Link to={location.pathname} onClick={() => setShowModalAuthorization(true)}><img
+                            src={imgSignIn} alt='login'/></Link>
+                    </li>
+                    <li className='li-text-login'>
+                        <Link to={location.pathname} onClick={() => setShowModalAuthorization(true)}>LOGIN</Link>
+                    </li>
                 </ul>
             </div>
 
         </>
     );
+}
+
+function saveToken(token) {
+    console.log(token);
 }

@@ -3,7 +3,7 @@ import {shallowEqual, useDispatch, useSelector} from "react-redux";
 
 import './style.scss';
 
-import {calendarFetchListOfBdays} from "../../Reducers/calendar";
+import {calendarFetchListOfBdays} from "../../Reducers/birthdays";
 
 import Table from "../Table";
 import Button from "../Button";

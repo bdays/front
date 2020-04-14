@@ -25,11 +25,67 @@
     background-color: darkgrey;
   }
 
-  img {
+  .icon-bDay {
     text-align: center;
     text-decoration: none;
     display: block;
-    padding: 5px 5px 5px 12px;
+    padding: 7px 10px 3px 10px;
+  }
+
+  .li-text-login {
+    float: right;
+
+    :hover {
+      background-color: transparent !important;
+    }
+
+    a {
+      cursor: default;
+      padding: 14px 0;
+    }
+
+  }
+
+  .li-img-login {
+    display: inline-block;
+    float: right;
+    text-align: center;
+
+    :hover {
+      background-color: transparent !important;
+    }
+
+    img {
+      width: 25px;
+    }
+
+    a {
+      text-align: center;
+      vertical-align: middle;
+      overflow: hidden;
+      padding: 9px 10px 8px 5px;
+      border-radius: 50%;
+
+      :hover {
+        transition: 1s; /*Скорость перехода состояния элемента*/
+        //box-shadow: none;
+        animation: active 0.7s 100; /* Указываем название анимации, её время и количество повторов*/
+
+      }
+    ;
+    }
+  }
+
+  @keyframes active {
+    0% {
+      transform: scale(1.0);
+    }
+    50% {
+      transform: scale(1.13);
+    }
+    100% {
+      transform: scale(1.0);
+    }
   }
 
   .dropdown-content {
@@ -39,18 +95,19 @@
     min-width: 160px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.40);
     z-index: -10;
-    opacity:0;
+    opacity: 0;
     transition: 1s;
   }
 
-  @keyframes show{
-    0%{
-      opacity:0;
+  @keyframes show {
+    0% {
+      opacity: 0;
     }
     100% {
-      opacity:1;
+      opacity: 1;
     }
   }
+
   .dropdown-content a {
     border-radius: 4px;
     color: black;
@@ -87,4 +144,13 @@
 }
 
 
-
+@media only screen and (max-width: 500px) {
+  * {
+    font-size: 13px !important;
+  }
+}
+@media only screen and (max-width: 400px) {
+  * {
+    font-size: 13px !important;
+  }
+}

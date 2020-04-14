@@ -4,6 +4,7 @@ import MainPage from '../Pages/Main';
 import ShowAllBdayPage from "../Pages/ShowAllBday";
 import PagesHeaders from "../Pages/pagesHeader";
 import ShowAllTemplatesPage from "../Pages/ShowAllTemplates";
+import AuthorizationPage from "../Pages/Authorization";
 
 export default function () {
     return (
@@ -13,8 +14,6 @@ export default function () {
                 <Route path="/" exact>
                     <MainPage/>
                 </Route>
-                {/*<Route path="/AddBday">*/}
-                {/*</Route>*/}
                 <Route path="/show-all-birthday">
                     <ShowAllBdayPage/>
                 </Route>
