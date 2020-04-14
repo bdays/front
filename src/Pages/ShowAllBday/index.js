@@ -58,12 +58,13 @@ function ShowAllBdayPage() {
 
     const table = useMemo(() => {
             return (payload && !isLoading) ?
-                ((viewMode)?getTableForViewMode(payload):getDefaultTable(payload))
+                ((viewMode) ? getTableForViewMode(payload) : getDefaultTable(payload))
                 : (<Table key='mainTable'
                           header={[]}
                           content={[]}
-                          isLoading={true}/>)}
-        , [payload,viewMode]);
+                          isLoading={true}/>)
+        }
+        , [payload, viewMode]);
 
     function getDefaultTable(payload) {
         let tableContent = [];
@@ -99,8 +100,8 @@ function ShowAllBdayPage() {
             });
         }
         return (<Table key='mainTable'
-                          header={[]} content={tableContent}
-                          isLoading={isLoading}/>);
+                       header={[]} content={tableContent}
+                       isLoading={isLoading}/>);
     }
 
     function getTableForViewMode(payload) {

@@ -13,6 +13,7 @@ import Modal from "../../components/Modal";
 import SnackBar from "../../components/SnackBar";
 import {dateToUnix, getCurrentDate, getDate, getLastMonth, getNextMonth} from "../../Utils/date";
 import {getCell} from "../../Utils/table";
+import {isUserLoggedIn} from "../../Utils/user";
 
 function MainPage() {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
@@ -28,6 +29,7 @@ function MainPage() {
 
     useEffect(() => {
         dispatch(calendarFetchListOfBdays());
+        isUserLoggedIn();
     }, [dispatch]);
 
     const handleEdit = useCallback((id, date) => {

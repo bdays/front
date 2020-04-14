@@ -6,56 +6,62 @@ import Button from "../Button";
 import Input from "../Input";
 import ErrorBlock from "../Error";
 import CalendarService from "../../Services/CalendarService";
+import {userLogin} from "../../Utils/user";
 
-function FormAuthorization({onSignIn, onContinueAsGuest, toClose}) {
-    const [data, setData] = useState({
+function FormAuthorization({onSignIn, toClose}) {
+    const [data, setData] = useState((localStorage.getItem('userData')) ? JSON.parse(localStorage.getItem('userData')):{
         userName: '',
         password: ''
     });
-    const [err, setErr] = useState({
-        show: false,
-        userName: '',
-        password: '',
-    });
+    const [err, setErr] = useState('');
+    const [checkboxValue, setCheckboxValue] = useState(false);
+
     const handleSignIn = () => {
         CalendarService.logIn(data).then(res => {
             if (res.data) {
-                saveToken(res.data.token);
+                userLogin(res.data);
+                if (checkboxValue) {
+                    localStorage.setItem('userData', JSON.stringify(data));
+                }
+                onSignIn();
                 toClose();
+            } else {
+                setErr('Incorrect login or password');
             }
         })
     }
     return (
         <>
             <form className='form-authorization'>
-                <label>Login<ErrorBlock content={err.userName}/>
+                <label>Login
                     <Input
                         placeholder='Enter login..'
                         value={data.userName}
                         handleChange={(e) => {
                             setData({...data, userName: e.target.value});
+                            setErr('');
                         }}/>
                 </label>
-                <label>Password<ErrorBlock content={err.password}/>
+                <label>Password
                     <Input
-                        placeholder='Enter login..'
+                        placeholder='Enter password..'
                         value={data.password}
                         handleChange={(e) => {
                             setData({...data, password: e.target.value});
+                            setErr('');
                         }}/>
                 </label>
+                <ErrorBlock content={err}/>
+                <label>
+                    <div className='checkbox'><input type="checkbox" value={checkboxValue}
+                                                     onChange={() => setCheckboxValue(!checkboxValue)}/>Remember me
+                    </div>
+                </label>
             </form>
-            <Button onClick={onContinueAsGuest}
-                    className="btn-continue">Continue as guest</Button>
             <Button onClick={() => handleSignIn()}
-                //onClick={() => onSignIn(data)}
                     className="btn-save">Sign in</Button></>
     );
 }
 
 export default FormAuthorization;
 
-function saveToken(token) {
-    localStorage.setItem('token', token);
-    console.log(token);
-}

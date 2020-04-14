@@ -1,5 +1,6 @@
 .form-authorization {
   overflow: hidden;
+
   input[type=text] {
     width: 100%;
     padding: 12px 20px;
@@ -12,10 +13,11 @@
 
   margin-bottom: 10px;
 
-  div {
-    border-radius: 5px;
-    background-color: #f2f2f2;
-    padding: 20px;
+  .checkbox{
+    padding: 5px;
+    text-align: right;
   }
-
+  input[type=checkbox] {
+    max-width: 20px;
+  }
 }

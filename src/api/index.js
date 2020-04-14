@@ -1,7 +1,5 @@
 import {defaultPath, methods} from "../Utils/constants";
 
-const token = localStorage.getItem('token');
-
 export function getBdaysList() {
     return getFetch('/bdays', methods.GET
     ).then(res => res.json()
@@ -60,9 +58,9 @@ export function getToken(data) {
 export function getFetch(path, method, data) {
     let options = {};
     options.method = method;
-    options.headers = {
-        'Authorization': 'Bearer ' + localStorage.getItem('token'),
-        'Content-Type': '',
+    options.headers = {};
+    if(localStorage.getItem('token')){
+        options.headers['Authorization'] = 'Bearer ' + localStorage.getItem('token');
     }
     if (method === methods.POST || method === methods.PUT) {
         options.body = JSON.stringify(data);
@@ -72,5 +70,3 @@ export function getFetch(path, method, data) {
         .then(res => res)
         .catch(err => console.log(err));
 }
-
-// const cors_api_url = 'https://cors-anywhere.herokuapp.com/';

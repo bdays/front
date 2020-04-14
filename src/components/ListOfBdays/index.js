@@ -10,7 +10,7 @@ import Button from "../Button";
 
 function ListOfBdays({onClickGo}) {
     const dispatch = useDispatch();
-    const {payload, isLoading} = useSelector(state => state.calendar.list, shallowEqual);
+    const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const [currentId, setCurrentId] = useState(null);//айди bday, с которым в данный момент работает пользователь
 
     useEffect(() => {

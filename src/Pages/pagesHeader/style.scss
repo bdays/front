@@ -99,6 +99,39 @@
     transition: 1s;
   }
 
+  .right {
+    float: right;
+    text-align: center;
+
+    :hover {
+      background-color: transparent;
+    }
+
+    img {
+      width: 25px;
+    }
+
+    a {
+      text-align: center;
+      vertical-align: middle;
+      overflow: hidden;
+      padding: 9px 10px 8px 5px;
+    }
+
+    .dropdown-content {
+      min-width: 100px;
+
+      a {
+        padding: 8px 10px;
+        text-align: right;
+      }
+
+      right: 0.5%;
+      background-color: #f9f9f9;
+    }
+
+  }
+
   @keyframes show {
     0% {
       opacity: 0;
@@ -149,6 +182,7 @@
     font-size: 13px !important;
   }
 }
+
 @media only screen and (max-width: 400px) {
   * {
     font-size: 13px !important;

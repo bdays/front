@@ -50,7 +50,9 @@ export function getLastMonth(date) {
 export function getCurrentDate() {
     return moment();
 }
-
+export function getCurrentDateInUNIX() {
+    return moment().unix();
+}
 export function getDate(date, format) {
     return date.format(format);
 }
