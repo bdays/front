@@ -2,6 +2,7 @@ import {dateFormat, isAllowedDate} from "./date";
 
 export const regForName = new RegExp('^[a-zA-Zа-яА-Я-]{2,30}$');
 export const regForDate = new RegExp(/^\d{1,2}\/\d{1,2}\/\d{4}$/);
+export const regForUserName = new RegExp('^[a-zA-Z0-9]{1,256}$');
 
 const emptyErr = 'the field cannot be empty!';
 const incorrectErr = 'incorrect value';
@@ -50,9 +51,9 @@ export function blocksValidation(blocks) {
     try {
         let per = JSON.parse(blocks);
         if (per['blocks']) {
-            error.blocks=per.blocks;
-        }else{//если поля blocks нет в объекте
-            error.blocks=per;
+            error.blocks = per.blocks;
+        } else {//если поля blocks нет в объекте
+            error.blocks = per;
         }
 
     } catch (e) {
@@ -62,5 +63,19 @@ export function blocksValidation(blocks) {
     return error;
 }
 
+export function userNameValidation(name) {
+    let err = '';
+    err = regForUserName.test(name) ? '' : incorrectErr;
+    err = isEmpty(name) ? emptyErr : err;
+    return err;
+}
+
+export function passwordValidation(password) {
+    let err = '';
+    err = (password.length < 8) ? 'password must be at least 8 characters' : '';
+    err = (password.length > 512) ? 'password cannot be so long' : err;
+    err = isEmpty(password) ? emptyErr : err;
+    return err;
+}
 
 
