@@ -9,7 +9,6 @@ import {
     isValidationSuccessful,
     passwordValidation,
 } from "../../Utils/validation";
-import SnackBar from "../SnackBar";
 import Spinner from "../Spinners";
 
 function FormEditPassword({onSave,onClose, currentPassword, isLoading}) {

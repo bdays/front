@@ -3,7 +3,12 @@ import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
 
-import {calendarFetchListOfBdays, calendarDeleteBday, calendarEditBday} from '../../Reducers/birthdays';
+import {
+    calendarFetchListOfBdays,
+    calendarDeleteBday,
+    calendarEditBday,
+    calendarFetchBday
+} from '../../Reducers/birthdays';
 
 import Calendar from "../../components/Calendar";
 import Table from "../../components/Table";
@@ -21,11 +26,12 @@ function MainPage() {
 
     const [dateForCalendar, setDateForCalendar] = useState(getCurrentDate());
     const [showModal, setShowModal] = useState(false);//модалка для редактирования ДР
-    const [editData, setEditData] = useState({id: null, firstName: '', lastName: '', data: {}, date: ''});//редактируемые данные, которые отобажаются в модалке
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [snackBarContent, setSnackBarContent] = useState('');
     const [showSimpleModal, setShowSimpleModal] = useState(false);//уточняющая модалка
     const [currentId, setCurrentId] = useState(null);//айди bday, с которым в данный момент работает пользователь
+    const payloadBday = useSelector(state => state.birthdays.bday.payload, shallowEqual);
+    const isLoadingBday = useSelector(state => state.birthdays.bday.isLoading, shallowEqual);
 
     useEffect(() => {
         dispatch(calendarFetchListOfBdays());
@@ -58,13 +64,17 @@ function MainPage() {
         })
     }, []);
 
+    const userData = useMemo(() => (payloadBday && !isLoadingBday) ?
+        {...payloadBday, id: currentId} : {id: null, firstName: '', lastName: '', data: {}, date: ''}
+        , [payloadBday, isLoadingBday, showModal]);
+
     const listOfBdays = useMemo(() => (payload && !isLoading) ?
         getListOfBdays() : []
-        , [payload, currentId,dateForCalendar]);
+        , [payload, currentId, dateForCalendar]);
 
     const importantDates = useMemo(() => (payload && !isLoading) ?
         getImportantDates() : []
-        , [payload,dateForCalendar]);
+        , [payload, dateForCalendar]);
 
 
     function getImportantDates() {
@@ -75,22 +85,19 @@ function MainPage() {
 
     function getListOfBdays() {
         return payload[getDate(dateForCalendar, 'MMMM')].map((item, index) => {
-            let action = [<Button key={'ButtonEdit' + index} children='Edit' className="btnEdit"
+            let action = (isUserLoggedIn())?[<Button key={'ButtonEdit' + index} children='Edit' className="btnEdit"
                                   onClick={() => {
-                                      setShowModal(true);
-                                      setEditData({
-                                          id: item.id,
-                                          firstName: item.firstName,
-                                          lastName: item.lastName,
-                                          data: {},
-                                          date: ''
-                                      })
+                                      setCurrentId(item.id);
+                                      dispatch(calendarFetchBday(item.id)).then(() => {
+                                          setShowModal(true)
+                                      }).catch(() => {
+                                      });
                                   }}/>,
                 <Button key={'ButtonDelete' + index} children='Delete' className="btn-delete"
                         onClick={() => {
                             setShowSimpleModal(true);
                             setCurrentId(item['id']);
-                        }}/>];
+                        }}/>]:[];
 
             return [
                 getCell('td-m', item.day),
@@ -114,7 +121,7 @@ function MainPage() {
                         date: dateToUnix(data.date),
                     });
                     setShowModal(false);
-                }} editData={editData}/>
+                }} editData={userData}/>
             }
             toClose={() => setShowModal(false)}
         />

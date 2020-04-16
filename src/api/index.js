@@ -6,6 +6,12 @@ export function getBdaysList() {
     ).catch(err => err);
 }
 
+export function getBday(id) {
+    return getFetch('/bdays/' + id, methods.GET
+    ).then(res => res.json()
+    ).catch(err => err);
+}
+
 export function addBday(data) {
     return getFetch('/bdays', methods.POST, data);
 }
@@ -16,6 +22,12 @@ export function deleteBday(id) {
 
 export function editBday(id, data) {
     return getFetch('/bdays/' + id, methods.PUT, data);
+}
+
+export function getChannelsList() {
+    return getFetch('/slack/channel_list', methods.GET
+    ).then(res => res.json()
+    ).catch(err => err);
 }
 
 

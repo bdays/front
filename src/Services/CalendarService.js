@@ -5,12 +5,16 @@ import {
     editBday,
     getTemplatesList,
     addTemplate,
-    deleteTemplate, getTemplate, editTemplate, getTemplateWithBday, getToken, addUser,
+    deleteTemplate, getTemplate, editTemplate, getTemplateWithBday, getToken, addUser, getChannelsList, getBday,
 } from "../api";
 
 class CalendarService {
     fetchListOfBdays() {
         return getBdaysList().then(res => res.data);
+    }
+
+    fetchBday(id) {
+        return getBday(id).then(res => res.data);
     }
 
     deleteBday(id) {
@@ -23,6 +27,10 @@ class CalendarService {
 
     editBday(id, data) {
         return editBday(id, data);
+    }
+
+    fetchListOfChannels() {
+        return getChannelsList().then(res => res.data);
     }
 
     /////////////
@@ -38,21 +46,24 @@ class CalendarService {
     deleteTemplate(id) {
         return deleteTemplate(id);
     }
+
     fetchTemplate(id) {
         return getTemplate(id).then(res => res.data);
     }
+
     editTemplate(id, data) {
         return editTemplate(id, data);
     }
 
-    getTemplateWithBday(templateId,bdayId) {
-        return getTemplateWithBday(templateId,bdayId).then(res => res.data);
+    getTemplateWithBday(templateId, bdayId) {
+        return getTemplateWithBday(templateId, bdayId).then(res => res.data);
     }
 
     ////////////////
     logIn(data) {
         return getToken(data);
     }
+
     addUser(data) {
         return addUser(data).then(res => res.data);
     }

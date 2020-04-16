@@ -1,5 +1,5 @@
 .form-addBday {
-  input[type=text]{
+  input[type=text] {
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -9,9 +9,11 @@
     box-sizing: border-box;
   }
 
-  div {
-    border-radius: 5px;
-    background-color: #f2f2f2;
-    padding: 20px;
+
+  p {
+    padding: 0 0 0 10px;
+    button{
+      font-size: 15px;
+    }
   }
 }

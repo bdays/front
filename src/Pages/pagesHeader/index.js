@@ -25,8 +25,8 @@ import FormEditPassword from "../../components/FormEditPassword";
 
 
 export default function () {
-    let location = useLocation();
-    let history = useHistory();
+    const location = useLocation();
+    const history = useHistory();
     const dispatch = useDispatch();
 
     const {isLoading} = useSelector(state => state.users.add, shallowEqual);
@@ -186,7 +186,7 @@ export default function () {
 
             <Modal show={showModalAuthorization} header='Authorization'
                    content={<FormAuthorization toClose={() => setShowModalAuthorization(false)}
-                                               onSignIn={() => setUserLoggedIn(isUserLoggedIn())}/>}
+                                               onSignIn={() => {setUserLoggedIn(isUserLoggedIn());dispatch(calendarFetchListOfBdays());}}/>}
                    toClose={() => setShowModalAuthorization(false)}/>
 
             <Modal show={showModalAddUser} header='Add user'
@@ -217,6 +217,7 @@ export default function () {
                                    setUserLoggedIn(isUserLoggedIn());
                                    setShowModalLogon(false);
                                    history.push("/");
+                                   dispatch(calendarFetchListOfBdays());
                                }}/>
                    </>}
                    toClose={() => setShowModalLogon(false)}/>

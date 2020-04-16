@@ -3,7 +3,12 @@ import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 
 import './style.scss';
 
-import {calendarDeleteBday, calendarFetchListOfBdays, calendarEditBday} from '../../Reducers/birthdays';
+import {
+    calendarDeleteBday,
+    calendarFetchListOfBdays,
+    calendarEditBday,
+    calendarFetchBday
+} from '../../Reducers/birthdays';
 
 import Table from "../../components/Table";
 import Button from "../../components/Button";
@@ -12,18 +17,20 @@ import Modal from "../../components/Modal";
 import SnackBar from "../../components/SnackBar";
 import {dateToUnix} from "../../Utils/date";
 import {getCell} from "../../Utils/table";
+import {isUserLoggedIn} from "../../Utils/user";
 
 function ShowAllBdayPage() {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const dispatch = useDispatch();
 
-    const [editData, setEditData] = useState({id: null, firstName: '', lastName: '', data: {}, date: ''});//редактируемые данные, которые отобажаются в модалке
     const [showModal, setShowModal] = useState(false);//модалка для редактирования ДР
     const [viewMode, setViewMode] = useState(false);//активаця режима просмотра
     const [showSimpleModal, setShowSimpleModal] = useState(false);//уточняющая модалка
     const [currentId, setCurrentId] = useState(null);//айди ДР, с которым в данный момент работает пользователь
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [snackBarContent, setSnackBarContent] = useState('');
+    const payloadBday = useSelector(state => state.birthdays.bday.payload, shallowEqual);
+    const isLoadingBday = useSelector(state => state.birthdays.bday.isLoading, shallowEqual);
 
     useEffect(() => {
         dispatch(calendarFetchListOfBdays());
@@ -66,6 +73,11 @@ function ShowAllBdayPage() {
         }
         , [payload, viewMode]);
 
+    const userData = useMemo(() => (payloadBday && !isLoadingBday) ?
+        {...payloadBday, id: currentId} : {id: null, firstName: '', lastName: '', data: {}, date: ''}
+        , [payloadBday, isLoadingBday, showModal]);
+
+
     function getDefaultTable(payload) {
         let tableContent = [];
         for (const item in payload) {
@@ -75,22 +87,19 @@ function ShowAllBdayPage() {
                 ]);
             }
             payload[item].forEach((subItem, subIndex) => {
-                let action = [<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
+                let action = (isUserLoggedIn())?[<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
                                       onClick={() => {
-                                          setShowModal(true);
-                                          setEditData({
-                                              id: subItem.id,
-                                              firstName: subItem.firstName,
-                                              lastName: subItem.lastName,
-                                              data: {},
-                                              date: ''
-                                          })
+                                          setCurrentId(subItem.id);
+                                          dispatch(calendarFetchBday(subItem.id)).then(() => {
+                                              setShowModal(true)
+                                          }).catch(() => {
+                                          });
                                       }}/>,
                     <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
                             onClick={() => {
                                 setCurrentId(subItem.id);
                                 setShowSimpleModal(true);
-                            }}/>];
+                            }}/>]:[];
 
                 tableContent.push([
                     getCell('td-m', subItem.day, null),
@@ -150,7 +159,7 @@ function ShowAllBdayPage() {
                        date: dateToUnix(data.date),
                    });
                    setShowModal(false);
-               }} editData={editData}/>}
+               }} editData={userData}/>}
                toClose={() => setShowModal(false)}/>
         <SnackBar show={showSnackBar} content={snackBarContent}/>
         <br/>

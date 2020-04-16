@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-
 import './style.scss'
 
 import Button from "../Button";
@@ -11,12 +10,15 @@ import {
     userNameValidation
 } from "../../Utils/validation";
 
+
 function FormAddUser({onSave}) {
+
     const [data, setData] = useState({
         userName: '',
         role: 2,
     });
     const [err, setErr] = useState(defaultErr);
+
 
     return (
         <>
@@ -31,7 +33,11 @@ function FormAddUser({onSave}) {
                 </label>
 
                 <label>Role
-                    <SelectBox onChange={(value) => setData({...data, role: Number(value)})} value={data.role}/>
+                    <SelectBox children={[
+                        {value: 1, text: 'Administrator'},
+                        {value: 2, text: 'Simple User'},
+                    ]}
+                               onChange={(value) => setData({...data, role: Number(value)})} value={data.role}/>
                 </label>
 
             </form>
