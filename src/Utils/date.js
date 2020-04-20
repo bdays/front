@@ -12,6 +12,10 @@ export function dateToUnix(date) {
     return moment(date + ' +0000', dateFormat + ' Z').unix();
 }
 
+export function unixToDate(timestamp) {
+    return moment.unix(timestamp).utc();
+}
+
 export function getDayOfWeek(date) {
     let dayOfWeek = Number(moment(date, dateFormat).format('d'));
     //поправки на то, что (0) - это воскресенье (воскресенье будем считать (7) - так удобнее)
@@ -50,10 +54,15 @@ export function getLastMonth(date) {
 export function getCurrentDate() {
     return moment();
 }
+
 export function getCurrentDateInUNIX() {
     return moment().unix();
 }
-export function getDate(date, format) {
+
+export function getStringFromDate(date, format) {
     return date.format(format);
 }
 
+export function getDateFromString(date, format) {
+    return moment(date, format);
+}

@@ -130,3 +130,21 @@ tr:hover {
     width: 50%;
   }
 }
+
+.table-schedule {
+  th, td {
+    border: 1px solid #ddd;
+    width: auto;
+  }
+
+  th {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 110%;
+  }
+
+  .attention {
+    background-color: rgba(255, 6, 0, 0.26);
+    color: black;
+  }
+}

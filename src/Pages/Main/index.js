@@ -16,7 +16,7 @@ import Button from "../../components/Button";
 import FormBday from "../../components/FormBday";
 import Modal from "../../components/Modal";
 import SnackBar from "../../components/SnackBar";
-import {dateToUnix, getCurrentDate, getDate, getLastMonth, getNextMonth} from "../../Utils/date";
+import {dateToUnix, getCurrentDate, getStringFromDate, getLastMonth, getNextMonth} from "../../Utils/date";
 import {getCell} from "../../Utils/table";
 import {isUserLoggedIn} from "../../Utils/user";
 import {buttons, getButton} from "../../Utils/buttons";
@@ -79,13 +79,13 @@ function MainPage() {
 
 
     function getImportantDates() {
-        return payload[getDate(dateForCalendar, 'MMMM')].map((item) => {
+        return payload[getStringFromDate(dateForCalendar, 'MMMM')].map((item) => {
             return item['day'];//формирование массива "важных дат" для календаря
         });
     }
 
     function getListOfBdays() {
-        return payload[getDate(dateForCalendar, 'MMMM')].map((item, index) => {
+        return payload[getStringFromDate(dateForCalendar, 'MMMM')].map((item, index) => {
             let action = (isUserLoggedIn()) ?
                 [
                     getButton(buttons.EDIT, () => {

@@ -3,6 +3,7 @@ import {getCurrentDateInUNIX} from "./date";
 export function isUserLoggedIn() {
     if (localStorage.getItem('token')) {
         const tokenLifetime = (localStorage.getItem('token')).split(".")[1];
+        //console.log(JSON.parse(atob(tokenLifetime)).exp);
         return (JSON.parse(atob(tokenLifetime)).exp > getCurrentDateInUNIX());
     } else {
         return false;

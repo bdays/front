@@ -59,7 +59,7 @@ function FormBday({editData, onSave, edit}) {
         return [{value: 0, text: '-- nothing selected --'}]
     }
 
-    return (isLoadingChannel||isLoadingTemplate)?(<Spinner className='loader1'/>):(
+    return (isLoadingChannel || isLoadingTemplate) ? (<Spinner className='loader1'/>) : (
         <>
             <div className='form-addBday'>
                 <label>First Name<ErrorBlock content={err.firstName}/>
@@ -99,6 +99,11 @@ function FormBday({editData, onSave, edit}) {
                                    setData({...data, data: {...data.data, targetChannelId: value}});
                                }}
                                value={(data.data.targetChannelId) ? data.data.targetChannelId : 0}/>
+                    {/*<Button onClick={() => {*/}
+                    {/*    console.log('loli');*/}
+
+                    {/*}}*/}
+                    {/*        className="btn-save">Test</Button>*/}
                 </label>
             </div>
             <Button onClick={() => {

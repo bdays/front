@@ -1,7 +1,7 @@
 import React, {} from 'react';
 import './style.scss';
 import {
-    getDate,
+    getStringFromDate,
     getDayOfLastMonth, getDayOfMonth,
     getDayOfWeek, getDaysInMonth, getFirstDayOfMonth, getLastDayOfMonth
 } from "../../Utils/date";
@@ -42,8 +42,8 @@ function Calendar({date, importantDates, clickPrevButton, clickNextButton, class
             <ul>
                 <li className="prev" onClick={clickPrevButton}>&#10094;</li>
                 <li className="next" onClick={clickNextButton}>&#10095;</li>
-                <li className='monthName'>{getDate(date,'MMMM')}<br/><span
-                    className="spanCalendar">{getDate(date,'YYYY')}</span></li>
+                <li className='monthName'>{getStringFromDate(date,'MMMM')}<br/><span
+                    className="spanCalendar">{getStringFromDate(date,'YYYY')}</span></li>
             </ul>
         </div>
         <ul className="weekdays">
