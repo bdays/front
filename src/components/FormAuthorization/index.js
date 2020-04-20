@@ -5,11 +5,14 @@ import './style.scss'
 import Button from "../Button";
 import Input from "../Input";
 import ErrorBlock from "../Error";
-import CalendarService from "../../Services/CalendarService";
 import {userLogin} from "../../Utils/user";
+import {useDispatch} from "react-redux";
+import {calendarLogin} from "../../Reducers/users";
 
 function FormAuthorization({onSignIn, toClose}) {
-    const [data, setData] = useState((localStorage.getItem('userData')) ? JSON.parse(localStorage.getItem('userData')):{
+    const dispatch = useDispatch();
+
+    const [data, setData] = useState((localStorage.getItem('userData')) ? JSON.parse(localStorage.getItem('userData')) : {
         userName: '',
         password: ''
     });
@@ -17,7 +20,7 @@ function FormAuthorization({onSignIn, toClose}) {
     const [checkboxValue, setCheckboxValue] = useState(false);
 
     const handleSignIn = () => {
-        CalendarService.logIn(data).then(res => {
+        dispatch(calendarLogin(data)).then(res => {
             if (res.data) {
                 userLogin(res.data);
                 if (checkboxValue) {
@@ -28,8 +31,11 @@ function FormAuthorization({onSignIn, toClose}) {
             } else {
                 setErr('Incorrect login or password');
             }
+        }).catch(() => {
+            setErr('Server error');
         })
     }
+
     return (
         <>
             <form className='form-authorization'>

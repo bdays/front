@@ -15,7 +15,9 @@ export function compareObj(a, b) {
             return false;
         }
         if (typeof array_of_obj_A[i][1] === 'object') {
-            return compareObj(array_of_obj_A[i][1], array_of_obj_B[i][1]);
+            if(!compareObj(array_of_obj_A[i][1], array_of_obj_B[i][1])){
+                return false;
+            }
         }
         if (array_of_obj_A[i][1] !== array_of_obj_B[i][1]) {
             return false;

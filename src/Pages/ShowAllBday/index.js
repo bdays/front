@@ -18,6 +18,7 @@ import SnackBar from "../../components/SnackBar";
 import {dateToUnix} from "../../Utils/date";
 import {getCell} from "../../Utils/table";
 import {isUserLoggedIn} from "../../Utils/user";
+import {buttons, getButton} from "../../Utils/buttons";
 
 function ShowAllBdayPage() {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
@@ -83,27 +84,33 @@ function ShowAllBdayPage() {
         for (const item in payload) {
             if (payload[item].length > 0) {//пишем название месяца только если там есть ДР
                 tableContent.push([
-                    getCell('heading', item, 3),
+                    getCell('heading', item, 4),
                 ]);
             }
             payload[item].forEach((subItem, subIndex) => {
-                let action = (isUserLoggedIn())?[<Button key={'ButtonEdit' + subIndex} children='Edit' className="btnEdit"
-                                      onClick={() => {
-                                          setCurrentId(subItem.id);
-                                          dispatch(calendarFetchBday(subItem.id)).then(() => {
-                                              setShowModal(true)
-                                          }).catch(() => {
-                                          });
-                                      }}/>,
-                    <Button key={'ButtonDelete' + subIndex} children='Delete' className="btn-delete"
-                            onClick={() => {
-                                setCurrentId(subItem.id);
-                                setShowSimpleModal(true);
-                            }}/>]:[];
+                let action = (isUserLoggedIn()) ?
+                    [
+                        getButton(buttons.EDIT, () => {
+                            setCurrentId(subItem.id);
+                            dispatch(calendarFetchBday(subItem.id)).then(() => {
+                                setShowModal(true)
+                            }).catch(() => {
+                            });
+                        }, 'ButtonEdit' + subIndex),
+                        getButton(buttons.DELETE, () => {
+                            setCurrentId(subItem.id);
+                            setShowSimpleModal(true);
+                        }, 'ButtonDelete' + subIndex),
+                    ] : [];
 
+                //checking for the existence of properties "templateId" and "targetChannelId"
+                let classNameTh = 'th-l';
+                if ((!("templateId" in subItem.data) || !("targetChannelId" in subItem.data)) && (isUserLoggedIn())) {
+                    classNameTh += ' attention';
+                }
                 tableContent.push([
                     getCell('td-m', subItem.day, null),
-                    getCell('th-l', subItem.fullName, null),
+                    getCell(classNameTh, subItem.fullName, null),
                     getCell('td-action', action, null),
                 ]);
             });

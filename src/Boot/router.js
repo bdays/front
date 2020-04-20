@@ -4,6 +4,7 @@ import MainPage from '../Pages/Main';
 import ShowAllBdayPage from "../Pages/ShowAllBday";
 import PagesHeaders from "../Pages/pagesHeader";
 import ShowAllTemplatesPage from "../Pages/ShowAllTemplates";
+import SchedulePage from "../Pages/Schedule";
 
 export default function () {
     return (
@@ -18,6 +19,9 @@ export default function () {
                 </Route>
                 <Route path="/show-all-templates">
                     <ShowAllTemplatesPage/>
+                </Route>
+                <Route path="/schedule">
+                    <SchedulePage/>
                 </Route>
             </Switch>
         </Router>

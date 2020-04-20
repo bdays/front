@@ -22,8 +22,8 @@ export const calendarEditBday = createAction('service/bdays/edit', (id,data) => 
   payload: CalendarService.editBday(id,data),
 }));
 
-export const calendarFetchListOfChannels = createAction('service/bdays/fetchChannels', () => ({
-  payload: CalendarService.fetchListOfChannels(),
+export const calendarFetchSchedule = createAction('service/bdays/schedule', () => ({
+  payload: CalendarService.fetchSchedule(),
 }));
 
 const initState = {
@@ -31,8 +31,8 @@ const initState = {
   delete: getDefaultState(),
   add: getDefaultState(),
   edit: getDefaultState(),
-  listOfChannels: getDefaultState(),
   bday: getDefaultState(),
+  schedule: getDefaultState(),
 };
 
 export default createReducer(initState, {
@@ -40,6 +40,6 @@ export default createReducer(initState, {
   ...getDefaultHandler(calendarDeleteBday, 'delete'),
   ...getDefaultHandler(calendarAddBday, 'add'),
   ...getDefaultHandler(calendarEditBday, 'edit'),
-  ...getDefaultHandler(calendarFetchListOfChannels, 'listOfChannels'),
   ...getDefaultHandler(calendarFetchBday, 'bday'),
+  ...getDefaultHandler(calendarFetchSchedule, 'schedule'),
 });

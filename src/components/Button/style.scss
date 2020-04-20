@@ -150,3 +150,16 @@ button {
     border: none;
   }
 }
+
+.button-img {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  &:hover {
+    border: 0 !important;
+    background-color: transparent;
+    padding: 0;
+    transform: scale(1.2);
+  }
+
+}

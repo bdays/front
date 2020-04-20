@@ -11,15 +11,16 @@ import {dateFormat} from "../../Utils/date";
 import SelectBox from "../SelectBox";
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {calendarFetchListOfTemplates} from "../../Reducers/templates";
-import {calendarFetchListOfChannels} from "../../Reducers/birthdays";
+import {calendarFetchListOfChannels} from "../../Reducers/slack";
+import Spinner from "../Spinners";
 
 function FormBday({editData, onSave, edit}) {
     const dispatch = useDispatch();
 
     const payloadTemplate = useSelector(state => state.templates.list.payload, shallowEqual);
     const isLoadingTemplate = useSelector(state => state.templates.list.isLoading, shallowEqual);
-    const payloadChannel = useSelector(state => state.birthdays.listOfChannels.payload, shallowEqual);
-    const isLoadingChannel = useSelector(state => state.birthdays.listOfChannels.isLoading, shallowEqual);
+    const payloadChannel = useSelector(state => state.slack.listOfChannels.payload, shallowEqual);
+    const isLoadingChannel = useSelector(state => state.slack.listOfChannels.isLoading, shallowEqual);
 
 
     const [data, setData] = useState(editData);
@@ -58,7 +59,7 @@ function FormBday({editData, onSave, edit}) {
         return [{value: 0, text: '-- nothing selected --'}]
     }
 
-    return (
+    return (isLoadingChannel||isLoadingTemplate)?(<Spinner className='loader1'/>):(
         <>
             <div className='form-addBday'>
                 <label>First Name<ErrorBlock content={err.firstName}/>

@@ -12,32 +12,40 @@ function Table({
                }) {
 
     let modifiedContent;
-    if (isLoading) {
-        modifiedContent = <tr>
-            <td colSpan={header.length}>
-                <Spinner className='loader1'/>
-            </td>
-        </tr>;
-    } else {
-        if (!content.length) {
+    try {
+        if (isLoading) {
             modifiedContent = <tr>
                 <td colSpan={header.length}>
-                    <div>No data</div>
+                    <Spinner className='loader1'/>
                 </td>
-            </tr>
+            </tr>;
         } else {
-            modifiedContent = content.map((item, i) => (
-                <tr key={'content' + i}>
-                    {item.map((itemChild, j) => (
-                        <td onClick={itemChild.onClickRow} key={'content' + i + '.' + j} colSpan={itemChild.colSpan}
-                            className={("classNameRow" in itemChild)?(itemChild.className + ' ' + itemChild.classNameRow):(itemChild.className)}>
-                            {itemChild.children}
-                        </td>
-                    ))}
-
+            if (!content.length) {
+                modifiedContent = <tr>
+                    <td colSpan={header.length}>
+                        <div>No data</div>
+                    </td>
                 </tr>
-            ))
+            } else {
+                modifiedContent = content.map((item, i) => (
+                    <tr key={'content' + i}>
+                        {item.map((itemChild, j) => (
+                            <td onClick={itemChild.onClickRow} key={'content' + i + '.' + j} colSpan={itemChild.colSpan}
+                                className={(itemChild.classNameRow) ? (itemChild.className + ' ' + itemChild.classNameRow) : (itemChild.className)}>
+                                {itemChild.children}
+                            </td>
+                        ))}
+
+                    </tr>
+                ))
+            }
         }
+    } catch (e) {
+        modifiedContent = <tr>
+            <td>
+                <div>Data display error</div>
+            </td>
+        </tr>
     }
 
     return (<div className={classNameBlock}>

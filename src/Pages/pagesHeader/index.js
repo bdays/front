@@ -36,17 +36,12 @@ export default function () {
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [snackBarContent, setSnackBarContent] = useState('');
     const [showModalAuthorization, setShowModalAuthorization] = useState(false);
-    const [userLoggedIn, setUserLoggedIn] = useState(false);
     const [showModalLogon, setShowModalLogon] = useState(false);
     const [showModalAddUser, setShowModalAddUser] = useState(false);
     const [showModalEditPassword, setShowModalEditPassword] = useState(false);
     const [showSimpleModal, setShowSimpleModal] = useState(false);
     const [contentFromModalEditPassword, setContentFromModalEditPassword] = useState('');
     const [contentFromSimpleModal, setContentFromSimpleModal] = useState('');
-
-    useEffect(() => {
-        setUserLoggedIn(isUserLoggedIn());
-    }, []);
 
     function displaySnackBar() {
         setShowSnackBar(true);
@@ -110,7 +105,7 @@ export default function () {
     }, []);
 
     let header;
-    if (userLoggedIn) {
+    if (isUserLoggedIn()) {
         header = (
             <>
                 <li className="dropdown">
@@ -119,6 +114,7 @@ export default function () {
                     <div className="dropdown-content">
                         <Link to={location.pathname} onClick={() => setShowModalBday(true)}>Add birthday</Link>
                         <Link to="/show-all-birthday">Show all birthdays</Link>
+                        <Link to="/schedule">Schedule</Link>
                     </div>
                 </li>
                 <li className="dropdown">
@@ -186,7 +182,9 @@ export default function () {
 
             <Modal show={showModalAuthorization} header='Authorization'
                    content={<FormAuthorization toClose={() => setShowModalAuthorization(false)}
-                                               onSignIn={() => {setUserLoggedIn(isUserLoggedIn());dispatch(calendarFetchListOfBdays());}}/>}
+                                               onSignIn={() => {
+                                                   dispatch(calendarFetchListOfBdays());
+                                               }}/>}
                    toClose={() => setShowModalAuthorization(false)}/>
 
             <Modal show={showModalAddUser} header='Add user'
@@ -214,7 +212,6 @@ export default function () {
                        <Button className='btn-modal-yes' children='Yes'
                                onClick={() => {
                                    userLogon();
-                                   setUserLoggedIn(isUserLoggedIn());
                                    setShowModalLogon(false);
                                    history.push("/");
                                    dispatch(calendarFetchListOfBdays());

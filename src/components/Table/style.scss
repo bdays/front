@@ -55,7 +55,6 @@ tr:hover {
 .heading { /*heading*/
   text-align: center;
   text-transform: uppercase;
-  color: #894641;
   padding: 8px;
   font-size: 16px;
   background-color: rgba(225, 186, 188, 0.44);
@@ -101,13 +100,33 @@ tr:hover {
 .table-ofTemplates {
   .trActive {
     background-color: rgba(225, 186, 188, 0.50);
-    border-radius: 4px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .td-sm {
+    width: auto;
+    padding: 8px 12px;
   }
 
   .th-l {
+    width: 100%;
+
     &:hover {
       cursor: pointer;
     }
   }
+}
 
+.table-on-main-page {
+  padding: 3px 0 0 0;
+  width: 100%;
+}
+
+@media screen and (min-width: 1000px) {
+  .table-on-main-page {
+    vertical-align: top;
+    display: inline-block;
+    padding: 0 0 0 2px;
+    width: 50%;
+  }
 }

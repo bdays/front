@@ -24,12 +24,17 @@ export function editBday(id, data) {
     return getFetch('/bdays/' + id, methods.PUT, data);
 }
 
+export function getSchedule() {
+    return getFetch('/bdays/schedule', methods.GET
+    ).then(res => res.json()
+    ).catch(err => err);
+}
+
 export function getChannelsList() {
     return getFetch('/slack/channel_list', methods.GET
     ).then(res => res.json()
     ).catch(err => err);
 }
-
 
 export function getTemplatesList() {
     return getFetch('/templates', methods.GET

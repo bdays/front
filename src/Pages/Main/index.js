@@ -19,6 +19,7 @@ import SnackBar from "../../components/SnackBar";
 import {dateToUnix, getCurrentDate, getDate, getLastMonth, getNextMonth} from "../../Utils/date";
 import {getCell} from "../../Utils/table";
 import {isUserLoggedIn} from "../../Utils/user";
+import {buttons, getButton} from "../../Utils/buttons";
 
 function MainPage() {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
@@ -85,19 +86,20 @@ function MainPage() {
 
     function getListOfBdays() {
         return payload[getDate(dateForCalendar, 'MMMM')].map((item, index) => {
-            let action = (isUserLoggedIn())?[<Button key={'ButtonEdit' + index} children='Edit' className="btnEdit"
-                                  onClick={() => {
-                                      setCurrentId(item.id);
-                                      dispatch(calendarFetchBday(item.id)).then(() => {
-                                          setShowModal(true)
-                                      }).catch(() => {
-                                      });
-                                  }}/>,
-                <Button key={'ButtonDelete' + index} children='Delete' className="btn-delete"
-                        onClick={() => {
-                            setShowSimpleModal(true);
-                            setCurrentId(item['id']);
-                        }}/>]:[];
+            let action = (isUserLoggedIn()) ?
+                [
+                    getButton(buttons.EDIT, () => {
+                        setCurrentId(item.id);
+                        dispatch(calendarFetchBday(item.id)).then(() => {
+                            setShowModal(true)
+                        }).catch(() => {
+                        });
+                    }, 'ButtonEdit' + index),
+                    getButton(buttons.DELETE, () => {
+                        setShowSimpleModal(true);
+                        setCurrentId(item['id']);
+                    }, 'ButtonDelete' + index)
+                ] : [];
 
             return [
                 getCell('td-m', item.day),
@@ -143,21 +145,32 @@ function MainPage() {
                   classNameCursor={isLoading ? 'waitCursor' : ''}
                   clickPrevButton={() => setDateForCalendar(getLastMonth(dateForCalendar))}
                   clickNextButton={() => setDateForCalendar(getNextMonth(dateForCalendar))}/>
-        <br/>
-        <Table
-            classNameTable=''
-            classNameTableHead=''
-            header={header}
-            content={listOfBdays}
-            isLoading={isLoading}
-        />
+        <div className='table-on-main-page'>
+            <div className="month">
+                <ul>
+                    <li className='monthName'><span
+                        className="spanCalendar">Birthdays</span></li>
+                </ul>
+            </div>
+            <Table
+                classNameTable=''
+                classNameTableHead=''
+                header={[]}
+                content={listOfBdays}
+                isLoading={isLoading}
+            /></div>
 
     </div>;
 }
 
 export default MainPage;
+// const header = [
+//     {name: 'date', alias: 'Day', className: 'td-sm'},
+//     {name: 'fullName', alias: 'Name', className: 'td-l'},
+//     {name: 'action', alias: '', className: 'td-action'},
+// ];
 const header = [
-    {name: 'date', alias: 'Day', className: 'td-sm'},
-    {name: 'fullName', alias: 'Name', className: 'td-l'},
-    {name: 'action', alias: '', className: 'td-action'},
+    {alias: '', className: 'td-sm'},
+    {alias: '', className: 'td-l'},
+    {alias: '', className: 'td-action'},
 ];

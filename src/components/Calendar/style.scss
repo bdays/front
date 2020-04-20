@@ -13,11 +13,13 @@ body {
 .calendar {
   width: 100%;
 }
-.waitCursor{
+
+.waitCursor {
   * {
     cursor: wait !important;
   }
 }
+
 .month {
   padding: 20px 20px;
   width: 100%;
@@ -84,7 +86,7 @@ body {
 }
 
 .days li :hover {
-  font-weight:bold;
+  font-weight: bold;
   font-size: 15px;
 }
 
@@ -102,6 +104,13 @@ body {
 .dayOfAnotherMonth {
   color: #919191 !important;
   cursor: default !important;
+}
+
+@media screen and (min-width: 1000px) {
+  .calendar {
+    width: 50%;
+    display: inline-block;
+  }
 }
 
 ///* Add media queries for smaller screens */
