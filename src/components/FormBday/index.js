@@ -113,7 +113,7 @@ function FormBday({editData, onSave, edit}) {
                         displaySnackBar();
                     });
                 }} children='Send test message'
-                            tooltipText='Send test message to the selected channel'
+                            tooltipText='Send test message into the selected channel'
                             disabled={!(data.data.targetChannelId) || (data.data.targetChannelId === '0')}
                 />
                 <label>Choose a channel
