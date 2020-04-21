@@ -13,7 +13,7 @@ import {
     addUser,
     getChannelsList,
     getBday,
-    getSchedule,
+    getSchedule, sendTestMessage,
 } from "../api";
 
 class CalendarService {
@@ -46,6 +46,9 @@ class CalendarService {
         return getChannelsList().then(res => res.data);
     }
 
+    sendTestMessage(data) {
+        return sendTestMessage(data);
+    }
     /////////////
 
     fetchListOfTemplates() {

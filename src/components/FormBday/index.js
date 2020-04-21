@@ -11,8 +11,10 @@ import {dateFormat} from "../../Utils/date";
 import SelectBox from "../SelectBox";
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 import {calendarFetchListOfTemplates} from "../../Reducers/templates";
-import {calendarFetchListOfChannels} from "../../Reducers/slack";
+import {calendarFetchListOfChannels, calendarSendTestMessage} from "../../Reducers/slack";
 import Spinner from "../Spinners";
+import ButtonHelp from "../ButtonHelp";
+import SnackBar from "../SnackBar";
 
 function FormBday({editData, onSave, edit}) {
     const dispatch = useDispatch();
@@ -22,7 +24,8 @@ function FormBday({editData, onSave, edit}) {
     const payloadChannel = useSelector(state => state.slack.listOfChannels.payload, shallowEqual);
     const isLoadingChannel = useSelector(state => state.slack.listOfChannels.isLoading, shallowEqual);
 
-
+    const [snackBarContent, setSnackBarContent] = useState('');
+    const [showSnackBar, setShowSnackBar] = useState(false);
     const [data, setData] = useState(editData);
     const [err, setErr] = useState({
         show: false,
@@ -35,6 +38,12 @@ function FormBday({editData, onSave, edit}) {
         dispatch(calendarFetchListOfTemplates());
         dispatch(calendarFetchListOfChannels());
     }, [dispatch]);
+
+    function displaySnackBar() {
+        setShowSnackBar(true);
+        setTimeout(() => setShowSnackBar(false), 4000);
+    }
+
     const contentOfSelectBoxOfTemplate = useMemo(() => (payloadTemplate && !isLoadingTemplate) ?
         getTemplateList() : getEmptySelectBox()
         , [payloadTemplate, isLoadingTemplate]);
@@ -61,6 +70,7 @@ function FormBday({editData, onSave, edit}) {
 
     return (isLoadingChannel || isLoadingTemplate) ? (<Spinner className='loader1'/>) : (
         <>
+            <SnackBar show={showSnackBar} content={snackBarContent}/>
             <div className='form-addBday'>
                 <label>First Name<ErrorBlock content={err.firstName}/>
                     <Input
@@ -93,17 +103,26 @@ function FormBday({editData, onSave, edit}) {
                                }}
                                value={(data.data.templateId) ? data.data.templateId : 0}/>
                 </label>
+                <ButtonHelp onClick={() => {
+                    dispatch(calendarSendTestMessage({"channelId": data.data.targetChannelId})).then(res => {
+                        if (res.err) {
+                            setSnackBarContent('Cannot send messages to this channel');
+                        } else {
+                            setSnackBarContent('Success');
+                        }
+                        displaySnackBar();
+                    });
+                }} children='Send test message'
+                            tooltipText='Send test message to the selected channel'
+                            disabled={!(data.data.targetChannelId) || (data.data.targetChannelId === '0')}
+                />
                 <label>Choose a channel
                     <SelectBox children={contentOfSelectBoxOfChannels}
                                onChange={(value) => {
                                    setData({...data, data: {...data.data, targetChannelId: value}});
                                }}
                                value={(data.data.targetChannelId) ? data.data.targetChannelId : 0}/>
-                    {/*<Button onClick={() => {*/}
-                    {/*    console.log('loli');*/}
 
-                    {/*}}*/}
-                    {/*        className="btn-save">Test</Button>*/}
                 </label>
             </div>
             <Button onClick={() => {

@@ -6,10 +6,17 @@ export const calendarFetchListOfChannels = createAction('service/slack/fetchChan
     payload: CalendarService.fetchListOfChannels(),
 }));
 
+export const calendarSendTestMessage = createAction('service/slack/testMessage', (data) => ({
+    payload: CalendarService.sendTestMessage(data),
+}));
+
+
 const initState = {
     listOfChannels: getDefaultState(),
+    testMessage: getDefaultState(),
 };
 
 export default createReducer(initState, {
     ...getDefaultHandler(calendarFetchListOfChannels, 'listOfChannels'),
+    ...getDefaultHandler(calendarSendTestMessage, 'testMessage'),
 });

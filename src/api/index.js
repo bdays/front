@@ -36,6 +36,11 @@ export function getChannelsList() {
     ).catch(err => err);
 }
 
+export function sendTestMessage(data) {
+    return getFetch('/slack/test_message', methods.POST, data).then(res => res.json()
+    ).catch(err => err);
+}
+
 export function getTemplatesList() {
     return getFetch('/templates', methods.GET
     ).then(res => res.json()
