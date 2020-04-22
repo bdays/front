@@ -21,7 +21,7 @@ import {getCell} from "../../Utils/table";
 import {isUserLoggedIn} from "../../Utils/user";
 import {buttons, getButton} from "../../Utils/buttons";
 
-function MainPage() {
+function MainPage({themeName}) {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const dispatch = useDispatch();
 
@@ -140,12 +140,14 @@ function MainPage() {
             show={showSnackBar}
             content={snackBarContent}
         />
-        <Calendar date={dateForCalendar}
+        <Calendar
+            themeName={themeName}
+            date={dateForCalendar}
                   importantDates={importantDates}
                   classNameCursor={isLoading ? 'waitCursor' : ''}
                   clickPrevButton={() => setDateForCalendar(getLastMonth(dateForCalendar))}
                   clickNextButton={() => setDateForCalendar(getNextMonth(dateForCalendar))}/>
-        <div className='table-on-main-page'>
+        <div className={themeName+' table-on-main-page'}>
             <div className="month">
                 <ul>
                     <li className='monthName'><span
@@ -164,13 +166,3 @@ function MainPage() {
 }
 
 export default MainPage;
-// const header = [
-//     {name: 'date', alias: 'Day', className: 'td-sm'},
-//     {name: 'fullName', alias: 'Name', className: 'td-l'},
-//     {name: 'action', alias: '', className: 'td-action'},
-// ];
-const header = [
-    {alias: '', className: 'td-sm'},
-    {alias: '', className: 'td-l'},
-    {alias: '', className: 'td-action'},
-];

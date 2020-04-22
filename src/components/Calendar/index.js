@@ -6,7 +6,7 @@ import {
     getDayOfWeek, getDaysInMonth, getFirstDayOfMonth, getLastDayOfMonth
 } from "../../Utils/date";
 
-function Calendar({date, importantDates, clickPrevButton, clickNextButton, classNameCursor}) {//importantDates = [number,number.....]
+function Calendar({date, importantDates, clickPrevButton, clickNextButton, classNameCursor, themeName}) {//importantDates = [number,number.....]
 
     let arrayOfDays = [];//массив с днями для формирования календаря
 
@@ -37,13 +37,13 @@ function Calendar({date, importantDates, clickPrevButton, clickNextButton, class
         arrayOfDays.push(<li className='dayOfAnotherMonth' key={'dayOfNextMonth' + i}>{i + 1}</li>);
     }
 
-    return (<div className={`calendar ${classNameCursor?classNameCursor:''}`}>
+    return (<div className={`${themeName} calendar ${classNameCursor ? classNameCursor : ''}`}>
         <div className="month">
             <ul>
                 <li className="prev" onClick={clickPrevButton}>&#10094;</li>
                 <li className="next" onClick={clickNextButton}>&#10095;</li>
-                <li className='monthName'>{getStringFromDate(date,'MMMM')}<br/><span
-                    className="spanCalendar">{getStringFromDate(date,'YYYY')}</span></li>
+                <li className='monthName'>{getStringFromDate(date, 'MMMM')}<br/><span
+                    className="spanCalendar">{getStringFromDate(date, 'YYYY')}</span></li>
             </ul>
         </div>
         <ul className="weekdays">

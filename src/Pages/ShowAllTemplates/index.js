@@ -20,11 +20,11 @@ import Spinner from "../../components/Spinners";
 import ButtonGroup from "../../components/ButtonGroup";
 import ListOfBdays from "../../components/ListOfBdays";
 import {getCell} from "../../Utils/table";
-import {isUserLoggedIn, userLogon} from "../../Utils/user";
+import {isUserLoggedIn} from "../../Utils/user";
 import {useHistory} from "react-router";
 import {buttons, getButton, getButtonForButtonGroup} from "../../Utils/buttons";
 
-export default function () {
+export default function ({themeName}) {
     const dispatch = useDispatch();
     const history = useHistory();
     const {payload, isLoading} = useSelector(state => state.templates.list, shallowEqual);
@@ -203,7 +203,7 @@ export default function () {
             <SnackBar show={showSnackBar} content={snackBarContent}/>
 
             <div className={(collapseTableOfTemplates) ? 'div-panel-left' : ''}>
-                <div className="month">
+                <div className={themeName+" month"}>
                     <ul>
                         <li className='monthName'><span
                             className="spanCalendar">Templates</span></li>
@@ -225,8 +225,3 @@ const edit = 'Edit';
 const del = 'Delete';
 const open = 'Open with Bday';
 const openTemplateWithBday = 'openTemplateWithBday';
-
-const header = [{name: 'number', alias: '№', className: 'heading'},
-    {name: 'name', alias: 'Name', className: 'heading'},
-    {name: 'action', alias: '', className: 'heading'},];
-

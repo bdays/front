@@ -161,5 +161,14 @@ button {
     padding: 0;
     transform: scale(1.2);
   }
+}
 
+.btn-selectThemes{
+  border-radius: 4px;
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  img{
+    width: 30px;
+  }
 }

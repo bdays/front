@@ -8,3 +8,10 @@ export const methods = {
     DELETE: 'DELETE',
     PUT: 'PUT'
 }
+
+export const themeNames = {
+    default: `default-theme`,
+    second: `second-theme`,
+    russia: `russia-theme`,
+    ukraine: `ukraine-theme`
+};

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Link, useLocation,} from 'react-router-dom';
 import {shallowEqual, useDispatch, useSelector} from "react-redux";
 
@@ -9,7 +9,7 @@ import {calendarAddBday, calendarFetchListOfBdays} from "../../Reducers/birthday
 import {calendarAddUser} from "../../Reducers/users";
 
 import imgBday from '../../image/iconBday.png';
-import imgSignIn from '../../image/icon-sign-in.png';
+import imgSignIn from '../../image/iconSignIn.png';
 import imgProfile from '../../image/iconProfile.png';
 import Modal from "../../components/Modal";
 import FormBday from "../../components/FormBday";
@@ -22,9 +22,14 @@ import Button from "../../components/Button";
 import {useHistory} from "react-router";
 import FormAddUser from "../../components/FormAddUser";
 import FormEditPassword from "../../components/FormEditPassword";
+import NavBar from "../../components/NavBar";
+import SelectBox from "../../components/SelectBox";
 
+import imgSettings from "../../image/iconSettings.svg";
+import {themeNames} from "../../Utils/constants";
+import {saveTheme} from "../../Utils/themes";
 
-export default function () {
+export default function ({themeName, setThemeName}) {
     const location = useLocation();
     const history = useHistory();
     const dispatch = useDispatch();
@@ -42,6 +47,7 @@ export default function () {
     const [showSimpleModal, setShowSimpleModal] = useState(false);
     const [contentFromModalEditPassword, setContentFromModalEditPassword] = useState('');
     const [contentFromSimpleModal, setContentFromSimpleModal] = useState('');
+    const [showSelectThemeBox, setShowSelectThemeBox] = useState(false);
 
     function displaySnackBar() {
         setShowSnackBar(true);
@@ -104,10 +110,20 @@ export default function () {
         })
     }, []);
 
+    function getThemesList() {
+        return Object.entries(themeNames).map((item) => {
+                return {value: item[1], text: item[0]}
+            }
+        )
+    }
+
     let header;
     if (isUserLoggedIn()) {
         header = (
             <>
+                <li>
+                    <Link to="/" className={('/' === location.pathname) ? 'active' : ''}>Main</Link>
+                </li>
                 <li className="dropdown">
                     <Link to={location.pathname}
                           className={('/show-all-birthday' === location.pathname) ? 'active' : ''}>Birthdays</Link>
@@ -128,7 +144,7 @@ export default function () {
                 </li>
                 {(Number(localStorage.getItem('role')) !== 1) ? '' : (
                     <li><Link to={location.pathname} onClick={() => setShowModalAddUser(true)}>Add user</Link></li>)}
-                <li className="dropdown right">
+                <li className="dropdown right ">
                     <Link to={location.pathname}><img
                         src={imgProfile} alt='login'/></Link>
                     <div className="dropdown-content">
@@ -148,6 +164,9 @@ export default function () {
     } else {
         header = (
             <>
+                <li>
+                    <Link to="/" className={('/' === location.pathname) ? 'active' : ''}>Main</Link>
+                </li>
                 <li>
                     <Link to="/show-all-birthday"
                           className={('/show-all-birthday' === location.pathname) ? 'active' : ''}>Birthdays</Link>
@@ -220,20 +239,21 @@ export default function () {
                    toClose={() => setShowModalLogon(false)}/>
 
             <SnackBar show={showSnackBar} content={snackBarContent}/>
+            <NavBar themeName={themeName} logo={imgBday} children={header}/>
 
-            <div className='router'>
-                <ul>
-                    <li>
-                        <img className='icon-bDay' src={imgBday} alt='Bday'/>
-                    </li>
-                    <li>
-                        <Link to="/" className={('/' === location.pathname) ? 'active' : ''}>Main</Link>
-                    </li>
-                    {header}
+            {(showSelectThemeBox) ? <SelectBox className='selectBox-selectThemes'
+                                               children={getThemesList()}
+                                               onChange={(value) => {
+                                                   setThemeName(value);
+                                                   saveTheme(value);
+                                               }}
+                                               value={themeName}/> : ''
+            }
 
-                </ul>
-            </div>
-
+            <Button className='button-img btn-selectThemes'
+                    children={<img
+                        src={imgSettings} alt='selectTheme' title='Select theme'/>}
+                    onClick={() => setShowSelectThemeBox(!showSelectThemeBox)}/>
         </>
     );
 }

@@ -1,3 +1,6 @@
+@import "themes";
+
+
 * {
   box-sizing: border-box;
 }
@@ -23,7 +26,10 @@ body {
 .month {
   padding: 20px 20px;
   width: 100%;
-  background: #ffd3d5;
+  @include themify {
+    background-color: $color-1;
+  }
+
   text-align: center;
 }
 
@@ -58,20 +64,30 @@ body {
 .weekdays {
   margin: 0;
   padding: 10px 0 10px 20px;
-  background-color: #e1babc;
+
+  @include themify {
+    background-color: $color-2;
+  }
 }
 
 .weekdays li {
   display: inline-block;
   width: 13.6%;
-  color: #666;
   text-align: center;
+
+  @include themify {
+    color: $color-5;
+  }
 }
 
 .days {
   padding: 10px 0 10px 20px;
-  background: #eee;
   margin: 0;
+
+  @include themify {
+    background-color: $color-3;
+  }
+
 }
 
 .days li {
@@ -92,17 +108,23 @@ body {
 
 .days li .active {
   padding: 8px;
-  //border-radius: 50%;
-  background: #ffd3d5;
-  color: black !important
+  color: black !important;
+
+  @include themify {
+    background-color: $color-1;
+  }
 }
 
 .days li .weekend {
-  color: #ff0e00 !important
+  @include themify {
+    color: $color-6;
+  }
 }
 
 .dayOfAnotherMonth {
-  color: #919191 !important;
+  @include themify {
+    color: $color-4;
+  }
   cursor: default !important;
 }
 
@@ -112,25 +134,3 @@ body {
     display: inline-block;
   }
 }
-
-///* Add media queries for smaller screens */
-//@media screen and (max-width: 720px) {
-//  .weekdays li, .days li {
-//    width: 13.1%;
-//  }
-//}
-//
-//@media screen and (max-width: 420px) {
-//  .weekdays li, .days li {
-//    width: 12.5%;
-//  }
-//  .days li .active {
-//    padding: 2px;
-//  }
-//}
-//
-//@media screen and (max-width: 290px) {
-//  .weekdays li, .days li {
-//    width: 12.2%;
-//  }
-//}
