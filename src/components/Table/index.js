@@ -9,6 +9,7 @@ function Table({
                    content,
                    isLoading,
                    classNameBlock,
+                   themeName,
                }) {
 
     let modifiedContent;
@@ -23,7 +24,7 @@ function Table({
             if (!content.length) {
                 modifiedContent = <tr>
                     <td colSpan={header.length}>
-                        <div>No data</div>
+                        <div className='div-no-data'>No data</div>
                     </td>
                 </tr>
             } else {
@@ -49,7 +50,7 @@ function Table({
     }
 
     return (<div className={classNameBlock}>
-        <table className={classNameTable}>
+        <table className={classNameTable+' '+themeName}>
             <thead className={classNameTableHead}>
             <tr>
                 {header.map((item, i) => (

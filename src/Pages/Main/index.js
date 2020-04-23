@@ -143,12 +143,12 @@ function MainPage({themeName}) {
         <Calendar
             themeName={themeName}
             date={dateForCalendar}
-                  importantDates={importantDates}
-                  classNameCursor={isLoading ? 'waitCursor' : ''}
-                  clickPrevButton={() => setDateForCalendar(getLastMonth(dateForCalendar))}
-                  clickNextButton={() => setDateForCalendar(getNextMonth(dateForCalendar))}/>
-        <div className={themeName+' table-on-main-page'}>
-            <div className="month">
+            importantDates={importantDates}
+            classNameCursor={isLoading ? 'waitCursor' : ''}
+            clickPrevButton={() => setDateForCalendar(getLastMonth(dateForCalendar))}
+            clickNextButton={() => setDateForCalendar(getNextMonth(dateForCalendar))}/>
+        <div className={themeName + ' table-on-main-page'}>
+            <div className="div-birthdays month">
                 <ul>
                     <li className='monthName'><span
                         className="spanCalendar">Birthdays</span></li>

@@ -20,7 +20,7 @@ import {getCell} from "../../Utils/table";
 import {isUserLoggedIn} from "../../Utils/user";
 import {buttons, getButton} from "../../Utils/buttons";
 
-function ShowAllBdayPage() {
+function ShowAllBdayPage({themeName}) {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const dispatch = useDispatch();
 
@@ -72,7 +72,7 @@ function ShowAllBdayPage() {
                           content={[]}
                           isLoading={true}/>)
         }
-        , [payload, viewMode]);
+        , [payload, viewMode, themeName]);
 
     const userData = useMemo(() => (payloadBday && !isLoadingBday) ?
         {...payloadBday, id: currentId} : {id: null, firstName: '', lastName: '', data: {}, date: ''}
@@ -115,7 +115,8 @@ function ShowAllBdayPage() {
                 ]);
             });
         }
-        return (<Table key='mainTable'
+        return (<Table themeName={themeName}
+                       key='mainTable'
                        header={[]} content={tableContent}
                        isLoading={isLoading}/>);
     }
@@ -136,7 +137,8 @@ function ShowAllBdayPage() {
                     getCell('td-l', (payload[item][i]) ? payload[item][i].fullName : '\u00A0', null),
                 ]);
             }
-            table.push(<Table key={'table' + item}
+            table.push(<Table themeName={themeName}
+                              key={'table' + item}
                               classNameTable='table-viewMode'
                               classNameBlock='div-forViewMode'
                               classNameTableHead='heading'

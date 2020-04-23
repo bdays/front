@@ -210,6 +210,7 @@ export default function ({themeName}) {
                     </ul>
                 </div>
                 <Table
+                    themeName={themeName}
                     classNameTable='table-ofTemplates'
                     header={[]} content={tableOfTemplates}
                     isLoading={isLoading}/>

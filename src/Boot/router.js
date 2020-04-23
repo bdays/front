@@ -19,7 +19,7 @@ export default function () {
                     <MainPage themeName={themeName}/>
                 </Route>
                 <Route path="/show-all-birthday">
-                    <ShowAllBdayPage/>
+                    <ShowAllBdayPage themeName={themeName}/>
                 </Route>
                 <Route path="/show-all-templates">
                     <ShowAllTemplatesPage themeName={themeName}/>
