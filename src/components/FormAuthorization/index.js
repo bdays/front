@@ -36,6 +36,11 @@ function FormAuthorization({onSignIn, toClose}) {
         })
     }
 
+    const handleChange = (data) => {
+        setData(data);
+        setErr('');
+    }
+
     return (
         <>
             <form className='form-authorization'>
@@ -43,19 +48,13 @@ function FormAuthorization({onSignIn, toClose}) {
                     <Input
                         placeholder='Enter login..'
                         value={data.userName}
-                        handleChange={(e) => {
-                            setData({...data, userName: e.target.value});
-                            setErr('');
-                        }}/>
+                        handleChange={(e) => handleChange({...data, userName: e.target.value})}/>
                 </label>
                 <label>Password
                     <Input
                         placeholder='Enter password..'
                         value={data.password}
-                        handleChange={(e) => {
-                            setData({...data, password: e.target.value});
-                            setErr('');
-                        }}/>
+                        handleChange={(e) => handleChange({...data, password: e.target.value})}/>
                 </label>
                 <ErrorBlock content={err}/>
                 <label>
