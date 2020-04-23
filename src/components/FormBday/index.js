@@ -39,6 +39,27 @@ function FormBday({editData, onSave, edit}) {
         dispatch(calendarFetchListOfChannels());
     }, [dispatch]);
 
+    useEffect(() => {
+        window.addEventListener("keydown", escFunction, {once: true, capture: false});
+        return () => {
+            window.removeEventListener("keydown", escFunction, {once: true, capture: false});
+        };
+    });
+
+    function escFunction(e) {
+        if (e.keyCode === 13) {
+            handleSave();
+        }
+    }
+
+    function handleSave() {
+        //валидация и только потом закрытие формы и др
+        setErr(formBdayValidation(data));
+        if (!formBdayValidation(data).show) {
+            onSave({...data, data: deleteEmptyProp(data.data)});
+        }
+    }
+
     function displaySnackBar() {
         setShowSnackBar(true);
         setTimeout(() => setShowSnackBar(false), 4000);
@@ -125,14 +146,7 @@ function FormBday({editData, onSave, edit}) {
 
                 </label>
             </div>
-            <Button onClick={() => {
-                //валидация и только потом закрытие формы и др
-                setErr(formBdayValidation(data));
-                if (!formBdayValidation(data).show) {
-                    onSave({...data, data: deleteEmptyProp(data.data)});
-                }
-
-            }}
+            <Button onClick={handleSave}
                     disabled={(compareObj(editData, data) && (edit)) ? ('disabled') : ('')}
                     className="btn-save">Save</Button></>
     );

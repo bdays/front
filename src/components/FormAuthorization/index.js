@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import './style.scss'
 
@@ -20,9 +20,23 @@ function FormAuthorization({onSignIn, toClose}) {
     const [err, setErr] = useState('');
     const [checkboxValue, setCheckboxValue] = useState(false);
 
+    useEffect(() => {
+        window.addEventListener("keydown", escFunction, {once: true, capture: false});
+        return () => {
+            window.removeEventListener("keydown", escFunction, {once: true, capture: false});
+        };
+    });
+
+    function escFunction(e) {
+        if (e.keyCode === 13) {
+            handleSignIn();
+        }
+    }
+
     const handleSignIn = () => {
         dispatch(calendarLogin(data)).then(res => {
             if (res.data) {
+
                 userLogin(res.data);
                 if (checkboxValue) {
                     localStorage.setItem('userData', JSON.stringify(data));

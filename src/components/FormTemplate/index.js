@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import './style.scss';
 
@@ -23,6 +23,30 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
     });
     const [blocks, setBlocks] = useState((edit)?JSON.stringify(data.blocks, null, "  "):'');
 
+    useEffect(() => {
+        window.addEventListener("keydown", escFunction, {once: true, capture: false});
+        return () => {
+            window.removeEventListener("keydown", escFunction, {once: true, capture: false});
+        };
+    });
+
+    function escFunction(e) {
+        if (e.keyCode === 13) {
+            handleSave();
+        }
+    }
+
+    function handleSave() {
+        setErr(formTemplateValidation(data, blocks, setData));
+        if (!formTemplateValidation(data, blocks, setData).show) {
+            let per = JSON.parse(blocks);
+            if (typeof per['blocks'] === "undefined") {//если поля blocks нет в объекте
+                per = {"blocks": per};
+            }
+            onSave({...data, blocks: [].concat(per.blocks)});
+        }
+    }
+
     function clickHelp(e) {
         e.preventDefault();
         const url = new URL(Slack_Block_Kit_Builder_URL);
@@ -33,14 +57,13 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
 
     return (
         <>
-            <form className='form-addTemplate'>
+            <div className='form-addTemplate'>
                 <label>Title<ErrorBlock content={err.title}/>
                     <Input
                         placeholder='Enter template name..'
                         value={data.title}
                         handleChange={(e) => {
                             setData({...data, title: e.target.value});
-                            //setErr(validation({...data, title: e.target.value}, blocks, setData));
                         }}/>
                 </label>
 
@@ -50,7 +73,6 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
                         value={data.text}
                         handleChange={(e) => {
                             setData({...data, text: e.target.value});
-                            //setErr(validation({...data, text: e.target.value}, blocks, setData));
                         }}/>
                 </label>
                 <label>Blocks
@@ -66,17 +88,8 @@ function FormTemplate({editData, onSave, edit}) {//если edit=true - Знач
                     handleChange={(e) => {
                         setBlocks(JSON.parse(JSON.stringify(e.target.value, null, "  ")));
                     }}/>
-            </form>
-            <Button onClick={() => {
-                setErr(formTemplateValidation(data, blocks, setData));
-                if (!formTemplateValidation(data, blocks, setData).show) {
-                    let per = JSON.parse(blocks);
-                    if (typeof per['blocks'] === "undefined") {//если поля blocks нет в объекте
-                        per = {"blocks": per};
-                    }
-                    onSave({...data, blocks: [].concat(per.blocks)});
-                }
-            }}
+            </div>
+            <Button onClick={handleSave}
                     disabled={(compareObj(editData, data) && (edit) && (blocks === JSON.stringify(editData.blocks, null, "  "))) ? ('disabled') : ('')}
                     className="btn-save">Save</Button></>
     );
