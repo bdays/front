@@ -172,3 +172,9 @@ button {
     width: 30px;
   }
 }
+
+button,
+button:active,
+button:focus {
+  outline: none;
+}

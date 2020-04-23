@@ -8,6 +8,7 @@ import ErrorBlock from "../Error";
 import {userLogin} from "../../Utils/user";
 import {useDispatch} from "react-redux";
 import {calendarLogin} from "../../Reducers/users";
+import InputPassword from "../InputPassword";
 
 function FormAuthorization({onSignIn, toClose}) {
     const dispatch = useDispatch();
@@ -43,7 +44,7 @@ function FormAuthorization({onSignIn, toClose}) {
 
     return (
         <>
-            <form className='form-authorization'>
+            <div className='form-authorization'>
                 <label>Login
                     <Input
                         placeholder='Enter login..'
@@ -51,7 +52,7 @@ function FormAuthorization({onSignIn, toClose}) {
                         handleChange={(e) => handleChange({...data, userName: e.target.value})}/>
                 </label>
                 <label>Password
-                    <Input
+                    <InputPassword
                         placeholder='Enter password..'
                         value={data.password}
                         handleChange={(e) => handleChange({...data, password: e.target.value})}/>
@@ -62,7 +63,7 @@ function FormAuthorization({onSignIn, toClose}) {
                                                      onChange={() => setCheckboxValue(!checkboxValue)}/>Remember me
                     </div>
                 </label>
-            </form>
+            </div>
             <Button onClick={() => handleSignIn()}
                     className="btn-save">Sign in</Button></>
     );
