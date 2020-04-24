@@ -3,22 +3,26 @@ $themes: (
                 'background-color-tr-hover': #f5f5f5,
                 'background-color-heading': rgba(225, 186, 188, 0.44),
                 'background-color-table-ofTemplates-trActive': rgba(225, 186, 188, 0.50),
+                'color-heading': black,
         ),
         'second': (
                 'background-color-tr-hover': rgba(241, 192, 131, 0.51),
                 'background-color-heading': #dca070,
                 'background-color-table-ofTemplates-trActive': #e6c292,
+                'color-heading': black,
         ),
         'russia': (
                 'background-color-tr-hover': rgb(213, 43, 30),
                 'background-color-heading': #0039a6,
                 'background-color-table-ofTemplates-trActive': #0039a6,
                 'color-hover-th-l': white,
+                'color-heading': #ffffff,
         ),
         'ukraine': (
                 'background-color-tr-hover': #FFD100,
                 'background-color-heading': #0082D1,
                 'background-color-table-ofTemplates-trActive': rgba(241, 191, 19, 0.5),
+                'color-heading': #ffffff,
         )
 ) !default;
 
@@ -29,6 +33,7 @@ $background-color-tr-hover: null;
 $background-color-heading: null;
 $background-color-table-ofTemplates-trActive: null;
 $color-hover-th-l: null;
+$color-heading: null;
 
 /// Миксин Themify
 /// @author Hugo Giraudel
@@ -44,6 +49,7 @@ $color-hover-th-l: null;
       $background-color-heading: map-get($colors, 'background-color-heading') !global;
       $background-color-table-ofTemplates-trActive: map-get($colors, 'background-color-table-ofTemplates-trActive') !global;
       $color-hover-th-l: map-get($colors,'color-hover-th-l') !global;
+      $color-heading: map-get($colors,'color-heading') !global;
       // Вывод пользовательского контента
       @content;
 
@@ -52,6 +58,7 @@ $color-hover-th-l: null;
       $background-color-heading: null !global;
       $background-color-table-ofTemplates-trActive: null !global;
       $color-hover-th-l: null !global;
+      $color-heading: null !global;
     }
   }
 }

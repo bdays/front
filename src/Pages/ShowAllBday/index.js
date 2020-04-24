@@ -20,6 +20,8 @@ import {getCell} from "../../Utils/table";
 import {isUserLoggedIn} from "../../Utils/user";
 import {buttons, getButton} from "../../Utils/buttons";
 
+import imgCalendarDefault from "../../image/iconCalendar.svg";
+
 function ShowAllBdayPage({themeName}) {
     const {payload, isLoading} = useSelector(state => state.birthdays.list, shallowEqual);
     const dispatch = useDispatch();
@@ -171,9 +173,12 @@ function ShowAllBdayPage({themeName}) {
                }} editData={userData}/>}
                toClose={() => setShowModal(false)}/>
         <SnackBar show={showSnackBar} content={snackBarContent}/>
-        <br/>
-        <Button className='btn-viewMode' children='view mode' onClick={() => setViewMode(!viewMode)}/><br/>
-        <br/>
+        <div className='div-viewMode'>
+            <Button children={<img
+                src={imgCalendarDefault} alt='def' title='default mode'/>} className={(viewMode)?'button-img active':'button-img'}
+                    onClick={() => setViewMode(!viewMode)}/>
+        <Button className='btn-viewMode' children='View mode' onClick={() => setViewMode(!viewMode)}/><br/>
+        </div>
         <div>{table}</div>
     </div>;
 }

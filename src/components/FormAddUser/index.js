@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './style.scss'
 
 import Button from "../Button";
@@ -19,6 +19,25 @@ function FormAddUser({onSave}) {
     });
     const [err, setErr] = useState(defaultErr);
 
+    useEffect(() => {
+        window.addEventListener("keydown", escFunction, {once: true, capture: false});
+        return () => {
+            window.removeEventListener("keydown", escFunction, {once: true, capture: false});
+        };
+    });
+
+    function escFunction(e) {
+        if (e.keyCode === 13) {
+            handleSave();
+        }
+    }
+
+    function handleSave() {
+        setErr(formAddUserValidation(data));
+        if (!formAddUserValidation(data).show) {
+            onSave(data);
+        }
+    }
 
     return (
         <>
@@ -41,12 +60,7 @@ function FormAddUser({onSave}) {
                 </label>
 
             </form>
-            <Button onClick={() => {
-                setErr(formAddUserValidation(data));
-                if (!formAddUserValidation(data).show) {
-                    onSave(data);
-                }
-            }}
+            <Button onClick={handleSave}
                     className="btn-save">Next</Button></>
     );
 }
