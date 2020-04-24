@@ -1,11 +1,31 @@
-import React, {useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
+
 import './style.scss'
+
 import Button from "../Button";
 import Input from "../Input";
 import ErrorBlock from "../Error";
-import moment from "moment";
+import {compareObj} from "../../Utils/objects";
+import {dateOfBdayValidation, isValidationSuccessful, nameValidation} from "../../Utils/validation";
+import {dateFormat} from "../../Utils/date";
+import SelectBox from "../SelectBox";
+import {shallowEqual, useDispatch, useSelector} from "react-redux";
+import {calendarFetchListOfTemplates} from "../../Reducers/templates";
+import {calendarFetchListOfChannels, calendarSendTestMessage} from "../../Reducers/slack";
+import Spinner from "../Spinners";
+import ButtonHelp from "../ButtonHelp";
+import SnackBar from "../SnackBar";
 
-function FormBday({editData, onSave}) {
+function FormBday({editData, onSave, edit}) {
+    const dispatch = useDispatch();
+
+    const payloadTemplate = useSelector(state => state.templates.list.payload, shallowEqual);
+    const isLoadingTemplate = useSelector(state => state.templates.list.isLoading, shallowEqual);
+    const payloadChannel = useSelector(state => state.slack.listOfChannels.payload, shallowEqual);
+    const isLoadingChannel = useSelector(state => state.slack.listOfChannels.isLoading, shallowEqual);
+
+    const [snackBarContent, setSnackBarContent] = useState('');
+    const [showSnackBar, setShowSnackBar] = useState(false);
     const [data, setData] = useState(editData);
     const [err, setErr] = useState({
         show: false,
@@ -14,77 +34,147 @@ function FormBday({editData, onSave}) {
         date: '',
     });
 
-    return (
+    useEffect(() => {
+        dispatch(calendarFetchListOfTemplates());
+        dispatch(calendarFetchListOfChannels());
+    }, [dispatch]);
+
+    useEffect(() => {
+        window.addEventListener("keydown", escFunction, {once: true, capture: false});
+        return () => {
+            window.removeEventListener("keydown", escFunction, {once: true, capture: false});
+        };
+    });
+
+    function escFunction(e) {
+        if (e.keyCode === 13) {
+            handleSave();
+        }
+    }
+
+    function handleSave() {
+        //валидация и только потом закрытие формы и др
+        setErr(formBdayValidation(data));
+        if (!formBdayValidation(data).show) {
+            onSave({...data, data: deleteEmptyProp(data.data)});
+        }
+    }
+
+    function displaySnackBar() {
+        setShowSnackBar(true);
+        setTimeout(() => setShowSnackBar(false), 4000);
+    }
+
+    const contentOfSelectBoxOfTemplate = useMemo(() => (payloadTemplate && !isLoadingTemplate) ?
+        getTemplateList() : getEmptySelectBox()
+        , [payloadTemplate, isLoadingTemplate]);
+
+    function getTemplateList() {
+        return getEmptySelectBox().concat(payloadTemplate.map((item) => (
+            {value: item.id, text: item.title}
+        )))
+    }
+
+    const contentOfSelectBoxOfChannels = useMemo(() => (payloadChannel && !isLoadingChannel) ?
+        getChannelsList() : getEmptySelectBox()
+        , [payloadChannel, isLoadingChannel]);
+
+    function getChannelsList() {
+        return getEmptySelectBox().concat(payloadChannel.map((item) => (
+            {value: item.id, text: item.name}
+        )))
+    }
+
+    function getEmptySelectBox() {
+        return [{value: 0, text: '-- nothing selected --'}]
+    }
+
+    return (isLoadingChannel || isLoadingTemplate) ? (<Spinner className='loader1'/>) : (
         <>
-            <form className={'formAddBday'}>
+            <SnackBar show={showSnackBar} content={snackBarContent}/>
+            <div className='form-addBday'>
                 <label>First Name<ErrorBlock content={err.firstName}/>
                     <Input
-                        placeholder={'Enter first name..'}
+                        placeholder='Enter first name..'
                         value={data.firstName}
                         handleChange={(e) => {
                             setData({...data, firstName: e.target.value});
-                            //setErr(validation({...data, firstName: 'Иван'}));
                         }}/>
                 </label>
                 <label>Last Name<ErrorBlock content={err.lastName}/>
                     <Input
-                        placeholder={'Enter last name..'}
+                        placeholder='Enter last name..'
                         value={data.lastName}
                         handleChange={(e) => {
                             setData({...data, lastName: e.target.value});
-                            //setErr(validation({...data, lastName: e.target.value}));
                         }}/>
                 </label>
                 <label>Date<ErrorBlock content={err.date}/>
                     <Input
-                        placeholder={'DD/MM/YYYY'}
+                        placeholder={dateFormat}
                         value={data.date}
                         handleChange={(e) => {
                             setData({...data, date: e.target.value});
-                            //setErr(validation({...data, date: '01/01/1999'}));
                         }}/>
                 </label>
-            </form>
-            <Button onClick={() => {
-                //валидация и только потом закрытие формы и др
-                setErr(validation(data));
-                if(!validation(data).show){onSave(data);}
+                <label>Choose a template
+                    <SelectBox children={contentOfSelectBoxOfTemplate}
+                               onChange={(value) => {
+                                   setData({...data, data: {...data.data, templateId: value}});
+                               }}
+                               value={(data.data.templateId) ? data.data.templateId : 0}/>
+                </label>
+                <ButtonHelp onClick={() => {
+                    dispatch(calendarSendTestMessage({"channelId": data.data.targetChannelId})).then(res => {
+                        if (res.err) {
+                            setSnackBarContent('Cannot send messages to this channel');
+                        } else {
+                            setSnackBarContent('Success');
+                        }
+                        displaySnackBar();
+                    });
+                }} children='Send test message'
+                            tooltipText='Send test message into the selected channel'
+                            disabled={!(data.data.targetChannelId) || (data.data.targetChannelId === '0')}
+                />
+                <label>Choose a channel
+                    <SelectBox children={contentOfSelectBoxOfChannels}
+                               onChange={(value) => {
+                                   setData({...data, data: {...data.data, targetChannelId: value}});
+                               }}
+                               value={(data.data.targetChannelId) ? data.data.targetChannelId : 0}/>
 
-            }}
-                    // disabled={err.show ? ('disabled') : ('')}
-                    className="btnSave">Save</Button></>
+                </label>
+            </div>
+            <Button onClick={handleSave}
+                    disabled={(compareObj(editData, data) && (edit)) ? ('disabled') : ('')}
+                    className="btn-save">Save</Button></>
     );
 }
 
 export default FormBday;
 
-function validation(data) {
+function deleteEmptyProp(data) {
+    for (let item in data) {
+        if (Number(data[item]) === 0) {
+            delete data[item];
+        }
+    }
+    return data;
+}
+
+export function formBdayValidation(data) {
     let err = {
         show: false,
         firstName: '',
         lastName: '',
         date: '',
     };
-    //валидация как на сервере
-    const reg = new RegExp('^[a-zA-Zа-яА-Я-]{2,30}$');
-    err.firstName = reg.test(data.firstName) ? '' : 'incorrect value';
-    err.lastName = reg.test(data.lastName) ? '' : 'incorrect value';
-    //err.date = /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(data.date) ? '' : 'incorrect value (date format: DD/MM/YYYY)';
-    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(data.date)) {
-        if ((moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix() > 0) && (moment(data.date + ' +0000', 'DD-MM-YYYY Z').unix() < 2147483648)) {
-            err.date = '';
-        } else {
-            err.date = 'incorrect value';
-        }
-    } else {
-        err.date = 'incorrect value (date format: DD/MM/YYYY)';
-    }
 
-    err.firstName = (data.firstName.length < 1) ? 'the field cannot be empty!' : err.firstName;
-    err.lastName = (data.lastName.length < 1) ? 'the field cannot be empty!' : err.lastName;
-    err.date = (data.date.length < 1) ? 'the field cannot be empty!' : err.date;
+    err.firstName = nameValidation(data.firstName);
+    err.lastName = nameValidation(data.lastName);
+    err.date = dateOfBdayValidation(data.date);
 
-    // incorrect value
-    err.show = Boolean(err.firstName.length + err.lastName.length + err.date.length);
+    err.show = !isValidationSuccessful(err);
     return err;
 }

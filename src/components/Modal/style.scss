@@ -10,25 +10,23 @@
   padding: 0;
   background-color: rgba(0, 0, 0, 0.62);
   overflow-y: auto;
+  overflow-x: hidden;
 }
-/* при отображении модального окна */
-.modal:target {
-  opacity: 1; /* делаем окно видимым */
-  pointer-events: auto; /* элемент видим для событий мыши */
-  overflow-y: auto; /* добавляем прокрутку по y, когда элемент не помещается на страницу */
-}
+
 /* ширина модального окна и его отступы от экрана */
 .modal-dialog {
   position: relative;
   width: auto;
   margin: 10px;
 }
+
 @media (min-width: 576px) {
   .modal-dialog {
     max-width: 500px;
     margin: 30px auto; /* для отображения модального окна по центру */
   }
 }
+
 /* свойства для блока, содержащего контент модального окна */
 .modal-content {
   position: relative;
@@ -44,16 +42,32 @@
   background-color: #fff;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, .2);
   border-radius: .3rem;
   outline: 0;
+
+  opacity:0; /*Элемент полностью прозрачный (невидимый)*/
+  transition: 1s; /*Скорость перехода состояния элемента*/
+  animation: show 1s 1; /* Указываем название анимации, её время и количество повторов*/
+  animation-fill-mode: forwards; /* Чтобы элемент оставался в конечном состоянии анимации */
 }
-@media (min-width: 768px) {
-  .modal-content {
-    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
-    box-shadow: 0 5px 15px rgba(0,0,0,.5);
+
+@keyframes show{
+  0%{
+    opacity:0;
+  }
+  100% {
+    opacity:1;
   }
 }
+
+@media (min-width: 768px) {
+  .modal-content {
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+  }
+}
+
 /* свойства для заголовка модального окна */
 .modal-header {
   display: -webkit-box;
@@ -71,6 +85,7 @@
   padding: 15px;
   border-bottom: 1px solid #eceeef;
 }
+
 .modal-title {
   margin-top: 0;
   margin-bottom: 0;
@@ -87,5 +102,7 @@
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   padding: 15px;
-  overflow: auto;
+  //overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

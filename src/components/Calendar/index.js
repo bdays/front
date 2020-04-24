@@ -1,27 +1,27 @@
 import React, {} from 'react';
-import moment from "moment";
 import './style.scss';
+import {
+    getStringFromDate,
+    getDayOfLastMonth, getDayOfMonth,
+    getDayOfWeek, getDaysInMonth, getFirstDayOfMonth, getLastDayOfMonth
+} from "../../Utils/date";
 
-function Calendar({date, importantDates, clickPrevButton, clickNextButton,classNameCursor}) {//importantDates = [number,number.....]
+function Calendar({date, importantDates, clickPrevButton, clickNextButton, classNameCursor, themeName}) {//importantDates = [number,number.....]
 
     let arrayOfDays = [];//массив с днями для формирования календаря
 
-    //получаем день недели, с которого начинается месяц (0 - Sunday)
-    let firstDayOfMonth = Number(moment('01/' + date.format('MM/YYYY'), "DD/MM/YYYY").format('d'));
-    let lastDayOfMonth = Number(moment(moment(date, "YYYY-MM").daysInMonth() + '/' + date.format('MM/YYYY'), "DD/MM/YYYY").format('d'));
-    //поправки на то, что (0) - это воскресенье (воскресенье будем считать (7) - так удобнее)
-    firstDayOfMonth = (firstDayOfMonth === 0) ? 7 : firstDayOfMonth;
-    lastDayOfMonth = (lastDayOfMonth === 0) ? 7 : lastDayOfMonth;
+    let firstDayOfMonth = getDayOfWeek(getFirstDayOfMonth(date));
+    let lastDayOfMonth = getDayOfWeek(getLastDayOfMonth(date));
 
     for (let i = 1; i < firstDayOfMonth; i++) {//добавляем дни предыдущего месяца (бледные)
-        let per = moment('01/' + date.format('MM/YYYY'), "DD/MM/YYYY").subtract((firstDayOfMonth - i), 'days').format('DD');
+        let per = getDayOfLastMonth(date, (firstDayOfMonth - i));
         arrayOfDays.push(<li className='dayOfAnotherMonth' key={'dayOfLastMonth' + i}>{per}</li>);
     }
 
-    for (let i = 0; i < moment(date, "YYYY-MM").daysInMonth(); i++) {//основная часть календаря
+    for (let i = 0; i < getDaysInMonth(date); i++) {//основная часть календаря
         let classWeekend = '';
-        const day = Number(moment((i + 1) + '/' + date.format('MM/YYYY'), "DD/MM/YYYY").format('d'));
-        if ((day === 6) || (day === 0)) {//если это суббота или воскресенье - выделяем их дургим цветом
+        const day = getDayOfWeek(getDayOfMonth(date, (i + 1)));
+        if (day > 5) {//если это суббота или воскресенье - выделяем их дургим цветом
             classWeekend = "weekend";
         }
 
@@ -37,13 +37,13 @@ function Calendar({date, importantDates, clickPrevButton, clickNextButton,classN
         arrayOfDays.push(<li className='dayOfAnotherMonth' key={'dayOfNextMonth' + i}>{i + 1}</li>);
     }
 
-    return (<div className={'calendar '+classNameCursor}>
+    return (<div className={`${themeName} calendar ${classNameCursor ? classNameCursor : ''}`}>
         <div className="month">
             <ul>
                 <li className="prev" onClick={clickPrevButton}>&#10094;</li>
                 <li className="next" onClick={clickNextButton}>&#10095;</li>
-                <li className='monthName'>{date.format('MMMM')}<br/><span
-                    className="spanCalendar">{date.format('YYYY')}</span></li>
+                <li className='monthName'>{getStringFromDate(date, 'MMMM')}<br/><span
+                    className="spanCalendar">{getStringFromDate(date, 'YYYY')}</span></li>
             </ul>
         </div>
         <ul className="weekdays">
@@ -62,5 +62,3 @@ function Calendar({date, importantDates, clickPrevButton, clickNextButton,classN
 }
 
 export default Calendar;
-
-//сделать окошко для выбора даты?

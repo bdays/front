@@ -1,12 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import './style.scss'
+
+import './style.scss';
+
+import {Slack_Block_Kit_Builder_URL} from "../../Utils/constants";
+
 import Button from "../Button";
 import TextArea from "../TextArea";
 import Input from "../Input";
 import ErrorBlock from "../Error";
+import {compareObj} from "../../Utils/objects";
+import {blocksValidation, isValidationSuccessful, titleValidation} from "../../Utils/validation";
+import ButtonHelp from "../ButtonHelp";
 
-
-function FormTemplate({editData, onSave}) {
+function FormTemplate({editData, onSave, edit}) {//если edit=true - Значит форма открыта для редактирования
     const [data, setData] = useState(editData);
     const [err, setErr] = useState({
         show: false,
@@ -15,71 +21,83 @@ function FormTemplate({editData, onSave}) {
         blocks: '',
         attachments: '',
     });
-    const [blocks, setBlocks] = useState((JSON.stringify(data.blocks) === '[]') ? '' : JSON.stringify(data.blocks));
+    const [blocks, setBlocks] = useState((edit)?JSON.stringify(data.blocks, null, "  "):'');
 
     useEffect(() => {
-        //console.log(data);
+        window.addEventListener("keydown", escFunction, {once: true, capture: false});
+        return () => {
+            window.removeEventListener("keydown", escFunction, {once: true, capture: false});
+        };
     });
+
+    function escFunction(e) {
+        if (e.keyCode === 13) {
+            handleSave();
+        }
+    }
+
+    function handleSave() {
+        setErr(formTemplateValidation(data, blocks, setData));
+        if (!formTemplateValidation(data, blocks, setData).show) {
+            let per = JSON.parse(blocks);
+            if (typeof per['blocks'] === "undefined") {//если поля blocks нет в объекте
+                per = {"blocks": per};
+            }
+            onSave({...data, blocks: [].concat(per.blocks)});
+        }
+    }
 
     function clickHelp(e) {
         e.preventDefault();
-        window.open('https://api.slack.com/tools/block-kit-builder');
+        const url = new URL(Slack_Block_Kit_Builder_URL);
+        url.searchParams.set("mode", "message");
+        url.searchParams.set("blocks", (edit) ? blocks : '[]');
+        window.open(url.toString());
     }
 
     return (
         <>
-            <form className={'formAddTemplate'}>
+            <div className='form-addTemplate'>
                 <label>Title<ErrorBlock content={err.title}/>
                     <Input
-                        placeholder={'Enter template name..'}
+                        placeholder='Enter template name..'
                         value={data.title}
                         handleChange={(e) => {
                             setData({...data, title: e.target.value});
-                            //setErr(validation({...data, title: e.target.value}, blocks, setData));
                         }}/>
                 </label>
 
                 <label>Text<ErrorBlock content={err.text}/>
                     <TextArea
-                        placeholder={'Enter text..'}
+                        placeholder='Enter text..'
                         value={data.text}
                         handleChange={(e) => {
                             setData({...data, text: e.target.value});
-                            //setErr(validation({...data, text: e.target.value}, blocks, setData));
-                        }}/>
-                </label><Button onClick={clickHelp} className="btnHelp tooltip">?
-                <span
-                    className="tooltiptext">open page in new tab - "https://api.slack.com/tools/block-kit-builder"</span></Button>
-                <label>Blocks
-                    <ErrorBlock content={err.blocks}/> {/*проверять на json*/}
-                    <TextArea
-                        className={'bigTextarea'}
-                        placeholder={'Insert JSON from "SLACK Block Kit Builder"'}
-                        value={blocks}
-                        handleChange={(e) => {
-                            //замена табуляций на два пробела - иначе скопированный с
-                            // block kit builder текст расползается и выглядит нечитабельным
-                            setBlocks(e.target.value.replace(/\u0009/g, "  "));
-                            //setErr(validation(data, e.target.value, setData));
-
                         }}/>
                 </label>
-            </form>
-            <Button onClick={() => {
-                setErr(validation(data, blocks, setData));
-                if (!validation(data, blocks, setData).show) {
-                    let per = JSON.parse(blocks);
-                    onSave({...data, blocks: [].concat(per.blocks)});
-                }
-            }}
-                // disabled={err.show ? ('disabled') : ('')}
-                    className="btnSave">Save</Button></>
+                <label>Blocks
+                </label>
+                <ButtonHelp onClick={clickHelp} children='Open SLACK'
+                            tooltipText={edit ? 'View template with Slack Block Kit Builder' : 'Open Slack Block Kit Builder'}/>
+                <ErrorBlock content={err.blocks}/> {/*проверять на json*/}
+
+                <TextArea
+                    className='textarea-forJSON'
+                    placeholder='Insert JSON from "SLACK Block Kit Builder"'
+                    value={blocks}
+                    handleChange={(e) => {
+                        setBlocks(JSON.parse(JSON.stringify(e.target.value, null, "  ")));
+                    }}/>
+            </div>
+            <Button onClick={handleSave}
+                    disabled={(compareObj(editData, data) && (edit) && (blocks === JSON.stringify(editData.blocks, null, "  "))) ? ('disabled') : ('')}
+                    className="btn-save">Save</Button></>
     );
 }
 
 export default FormTemplate;
 
-function validation(data, blocks, setData) {
+function formTemplateValidation(data, blocks, setData) {
     let err = {
         show: false,
         title: '',
@@ -88,23 +106,15 @@ function validation(data, blocks, setData) {
         attachments: '',
     };
 
-    err.title = (data.title.length < 1) ? 'the field cannot be empty!' : err.title;
-    err.text = (data.text.length < 1) ? 'the field cannot be empty!' : err.text;
-    err.blocks = (blocks.length < 1) ? 'the field cannot be empty!' : err.blocks;
+    err.title = titleValidation(data.title);
+    err.text = titleValidation(data.text);
 
-    try {
-        let per = JSON.parse(blocks);
-        setData({...data, blocks: [].concat(per.blocks)});
-        //setData({...data, blocks: [].concat(per.blocks)});
-    } catch (e) {
-        err.blocks = 'JSON error';// + e;
-        try {
-            setData({...data, blocks: []});
-        } catch (e) {
+    const blocksValid = blocksValidation(blocks);
 
-        }
-    }
+    err.blocks = blocksValid.err;
+    setData({...data, blocks: [].concat(blocksValid.blocks)});
 
-    err.show = Boolean(err.title.length + err.text.length + err.blocks.length + err.attachments.length);
+    err.show = !isValidationSuccessful(err);
     return err;
 }
+

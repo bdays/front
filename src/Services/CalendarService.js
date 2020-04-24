@@ -5,48 +5,85 @@ import {
     editBday,
     getTemplatesList,
     addTemplate,
-    deleteTemplate, getTemplate, editTemplate,
+    deleteTemplate,
+    getTemplate,
+    editTemplate,
+    getTemplateWithBday,
+    getToken,
+    addUser,
+    getChannelsList,
+    getBday,
+    getSchedule, sendTestMessage,
 } from "../api";
 
 class CalendarService {
     fetchListOfBdays() {
         return getBdaysList().then(res => res.data);
-        // return new Promise(resolve => {
-        //     setTimeout(resolve, 3000, fakeData);
-        // });
+    }
+
+    fetchBday(id) {
+        return getBday(id).then(res => res.data);
     }
 
     deleteBday(id) {
-        return deleteBday(id).then(res => res);
+        return deleteBday(id);
     }
 
     addBday(data) {
-        return addBday(data).then(res => res);
+        return addBday(data);
     }
 
     editBday(id, data) {
-        return editBday(id, data).then(res => res);
+        return editBday(id, data);
     }
 
-    ///////////
+    fetchSchedule() {
+        return getSchedule().then(res => res.data);
+    }
+
+    /////////////
+    fetchListOfChannels() {
+        return getChannelsList().then(res => res.data);
+    }
+
+    sendTestMessage(data) {
+        return sendTestMessage(data);
+    }
+    /////////////
 
     fetchListOfTemplates() {
         return getTemplatesList().then(res => res.data);
     }
 
     addTemplate(data) {
-        return addTemplate(data).then(res => res);
+        return addTemplate(data);
     }
 
     deleteTemplate(id) {
-        return deleteTemplate(id).then(res => res);
+        return deleteTemplate(id);
     }
+
     fetchTemplate(id) {
         return getTemplate(id).then(res => res.data);
     }
+
     editTemplate(id, data) {
-        return editTemplate(id, data).then(res => res);
+        return editTemplate(id, data);
     }
+
+    getTemplateWithBday(templateId, bdayId) {
+        return getTemplateWithBday(templateId, bdayId).then(res => res.data);
+    }
+
+    ////////////////
+    logIn(data) {
+        return getToken(data);
+    }
+
+    addUser(data) {
+        return addUser(data).then(res => res.data);
+    }
+
 }
 
 export default new CalendarService();

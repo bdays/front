@@ -1,0 +1,75 @@
+$themes: (
+        'default': (
+                'color-1': #FFD3D5, //month, important dates
+                'color-2': #E1BABC, //div name days of week
+                'color-3': #eeeeee, //body (days of month)
+                'color-4': #919191, //days another month
+                'color-5': #666, //name days of week
+                'color-6': #ff0e00, //weekend
+        ),
+        'second': (
+                'color-1': #e6c292,
+                'color-2': #dca070,
+                'color-3': #FFF6EB,
+                'color-4': #919191,
+                'color-5': #212124,
+                'color-6': #ff0e00,
+        ),
+        'russia': (
+                'color-1': #f6f0f0,
+                'color-2': #0039a6,
+                'color-3': #d52b1e,
+                'color-4': #ec8686,
+                'color-5': #000000,
+                'color-6': #fcfcfc,
+        ),
+        'ukraine': (
+                'color-1': #0082D1,
+                'color-2': #FFD100,
+                'color-3': #FFDD77,
+                'color-4': #919191,
+                'color-5': #212124,
+                'color-6': #ff0e00,
+        )
+) !default;
+
+// Инициализируем наши переменные как `null`, таким образом,
+// при использовании вне `themify`, они ничего не выведут.
+
+$color-1: null;
+$color-2: null;
+$color-3: null;
+$color-4: null;
+$color-5: null;
+$color-6: null;
+
+/// Миксин Themify
+/// @author Hugo Giraudel
+/// @param {Map} $themes [$themes] - ассоциативный массив с темами
+@mixin themify($themes: $themes) {
+  // Проход по темам
+  @each $theme, $colors in $themes {
+    // Создание селектора (типа `.media.theme-unicorn, .theme-unicorn .media`)
+    &.#{$theme}-theme,
+    .#{$theme}-theme & {
+      // Задание переменных темы как глобальных с `!global`
+      $color-1: map-get($colors, 'color-1') !global;
+      $color-2: map-get($colors, 'color-2') !global;
+      $color-3: map-get($colors, 'color-3') !global;
+      $color-4: map-get($colors, 'color-4') !global;
+      $color-5: map-get($colors, 'color-5') !global;
+      $color-6: map-get($colors, 'color-6') !global;
+
+      // Вывод пользовательского контента
+      @content;
+
+      // Глобальное отключение переменных темы с `!global`
+      $color-1: null !global;
+      $color-2: null !global;
+      $color-3: null !global;
+      $color-4: null !global;
+      $color-5: null !global;
+      $color-6: null !global;
+    }
+  }
+}

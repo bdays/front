@@ -1,0 +1,49 @@
+.pass {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  input, button {
+    border: none;
+    outline: none;
+    border-radius: 3px;
+  }
+
+  input {
+    width: 100%;
+    background: #ffffff;
+    padding-left: 15px;
+  }
+
+  button {
+    cursor: default;
+    height: auto;
+    width: auto;
+    margin: 8px 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: transparent;
+    padding: 10px 12px;
+    font-size: 16px;
+
+    img {
+      width: 25px;
+    }
+
+    :hover {
+      cursor: pointer;
+
+    }
+  }
+
+  button:before {
+    color: #F9F0DA;
+    font-size: 20px;
+    font-weight: bold;
+  }
+}

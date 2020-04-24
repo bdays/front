@@ -1,33 +1,41 @@
 import React, {} from "react";
 import './style.scss';
-import Button from "../Button";
+import ButtonHelp from "../ButtonHelp";
+import TextArea from "../TextArea";
+import {Slack_Block_Kit_Builder_URL} from "../../Utils/constants";
+import ErrorBlock from "../Error";
 
-function ShowTemplate({payload,toClose}) {
+function ShowTemplate({payload}) {
+    try {
+        return (<div className='div-showTemplate'>
+            <p><b>TITLE:</b></p>
+            <blockquote>
+                <p>{payload.title}</p>
+            </blockquote>
+            <p><b>TEXT:</b></p>
+            <blockquote>
+                <p>{payload.text}</p>
+            </blockquote>
+            <p><b>BLOCKS:</b>
+                <ButtonHelp onClick={() => {
+                    const url = new URL(Slack_Block_Kit_Builder_URL);
+                    url.searchParams.set("mode", "message");
+                    url.searchParams.set("blocks", JSON.stringify(payload.blocks));
+                    window.open(url.toString());
+                }} children='Open in SLACK'
+                            tooltipText='View template with Slack Block Kit Builder'/>
+            </p>
+            <TextArea
+                className='textarea-forJSON'
+                value={JSON.stringify(payload.blocks, null, "  ")}
+                readOnly={true}
+            />
 
-    function clickGO(e) {
-        e.preventDefault();
-        window.open('https://api.slack.com/tools/block-kit-builder?mode=message&blocks='
-            + encodeURI(JSON.stringify(payload.blocks)));
+        </div>);
+    } catch (e) {
+        return (<div className='div-showTemplate'><ErrorBlock content={'Data display error'}/></div>);
     }
 
-    return (<div className={'divShowTemplate'}>
-        <Button onClick={toClose} className="close">×</Button>
-        <p><b>TITLE:</b></p>
-        <blockquote>
-            <p>{payload.title}</p>
-        </blockquote>
-        <p><b>TEXT:</b></p>
-        <blockquote>
-            <p>{payload.text}</p>
-        </blockquote>
-        <p><b>BLOCKS:</b> <Button onClick={clickGO} className="btnHelp tooltip">?
-            <span className="tooltiptext">View template with Slack Block Kit Builder</span></Button>
-        </p>
-
-
-            <div>{JSON.stringify(payload.blocks)}</div>
-
-    </div>);
 }
 
 export default ShowTemplate;
